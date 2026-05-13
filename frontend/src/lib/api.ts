@@ -128,5 +128,7 @@ export function mediaUrl(path?: string | null) {
   if (!path) return '';
   if (/^https?:\/\//i.test(path)) return path;
   const p = path.startsWith('/') ? path : `/${path}`;
-  return `${IMG_BASE}${p}`;
+  // Add /media prefix if it's not already there
+  const mediaPrefix = p.startsWith('/media/') ? '' : '/media';
+  return `${IMG_BASE}${mediaPrefix}${p}`;
 }
