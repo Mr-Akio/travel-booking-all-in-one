@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --background: #f8fafc; /* สีเทาอ่อนมากๆ ดูแพงกว่าขาวล้วน */
+  --foreground: #1e293b;
+  --primary: #f97316;
+  --font-sans: 'Poppins', sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --color-primary: var(--primary);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.card-shadow {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.card-shadow:hover {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+.btn-modern {
+  @apply bg-orange-500 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-200 hover:bg-orange-600 active:scale-95 shadow-md hover:shadow-orange-200;
+}
