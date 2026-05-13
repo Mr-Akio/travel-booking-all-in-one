@@ -55,7 +55,7 @@ export default function PackagesPage() {
   useEffect(() => {
     (async () => {
        try {
-         const data = await api.get<TourPackage[]>('users/packages/');
+         const data = await api.get<TourPackage[]>('/api/users/packages/');
          setPackages(data);
        } catch {
          setPackages([]);

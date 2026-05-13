@@ -32,7 +32,7 @@ export default function HomePage() {
   useEffect(() => {
     (async () => {
       try {
-        const data = await api.get<TourPackage[]>('users/packages/');
+        const data = await api.get<TourPackage[]>('/api/users/packages/');
         setPackages(data);
       } catch (err) {
         console.error('❌ Failed to load packages', err);

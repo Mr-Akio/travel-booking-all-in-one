@@ -82,7 +82,7 @@ export default function PackageDetailPage() {
     if (!id) return;
     (async () => {
       try {
-        const data = await api.get<TourPackage>(`users/packages/${id}/`);
+        const data = await api.get<TourPackage>(`/api/users/packages/${id}/`);
         setTour(data);
         setSelectedPath(pickCoverPath(data));
       } catch {
@@ -118,8 +118,7 @@ export default function PackageDetailPage() {
       return;
     }
 
-    try {
-      const data = await api.post<any>(`users/bookings/create/`, {
+      const data = await api.post<any>(`/api/users/bookings/create/`, {
         package_id: tour.id,
         travel_date: tour.start_date,
         number_of_people: people,
