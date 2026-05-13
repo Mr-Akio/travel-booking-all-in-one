@@ -118,6 +118,7 @@ export default function PackageDetailPage() {
       return;
     }
 
+    try {
       const data = await api.post<any>(`/api/users/bookings/create/`, {
         package_id: tour.id,
         travel_date: tour.start_date,
