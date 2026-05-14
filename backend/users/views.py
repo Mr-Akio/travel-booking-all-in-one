@@ -123,12 +123,15 @@ from datetime import datetime
 def register(request):
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
-        user = serializer.save()
+        try:
+            user = serializer.save()
+        except Exception as e:
+            return Response({"detail": f"Database error: {str(e)}"}, status=500)
+            
         try:
             send_verification_email(user, request)
         except Exception as e:
             print(f"Email sending failed: {e}")
-            # We still return 201 because the user was created successfully
             return Response({
                 "message": "Registration successful, but verification email could not be sent. Please contact support.",
                 "user_id": user.id
