@@ -733,26 +733,9 @@ def download_booking_pdf_by_id(request, booking_id):
 
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def create_blog_post(request):
-    title = request.data.get('title')
-    content = request.data.get('content')
-    tags = request.data.get('tags', '')
-    image = request.FILES.get('image')
-
-    post = BlogPost.objects.create(
-        user=request.user,
-        title=title,
-        content=content,
-        tags=tags,
-        image=image
-    )
-    return Response({'message': 'Blog created', 'id': post.id})
-
-
-
-
+# ------------------------------
+# 📝 Blog Posts
+# ------------------------------
 class BlogPostListCreateView(generics.ListCreateAPIView):
     queryset = BlogPost.objects.filter(is_published=True).order_by('-created_at')
     serializer_class = BlogPostSerializer
@@ -761,24 +744,6 @@ class BlogPostListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
-
-
-
-class BlogPostCreateView(APIView):
-    permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
-
-    def post(self, request):
-        serializer = BlogPostSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(author=request.user)
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
-
-
-
-        
         
 class BlogPostDetailView(RetrieveAPIView):
     queryset = BlogPost.objects.all()
