@@ -559,36 +559,50 @@ class PackageReviewListView(generics.ListAPIView):
     
     
 import requests
-import threading
+import base64
+from email.mime.text import MIMEText
 
-def send_resend_email(subject, html_content, to_email):
-    """Utility to send email via Resend API"""
+def send_gmail_api_email(subject, html_content, to_email):
+    """Utility to send email via Gmail API using OAuth2 Refresh Token"""
     from django.conf import settings
-    api_key = settings.RESEND_API_KEY
-    if not api_key:
-        print("RESEND_API_KEY not found")
-        return False
-        
-    url = "https://api.resend.com/emails"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "from": "Travel Booking <onboarding@resend.dev>",
-        "to": [to_email],
-        "subject": subject,
-        "html": html_content
+    
+    # 1. Get access token from refresh token
+    token_url = "https://oauth2.googleapis.com/token"
+    token_data = {
+        "client_id": settings.GMAIL_CLIENT_ID,
+        "client_secret": settings.GMAIL_CLIENT_SECRET,
+        "refresh_token": settings.GMAIL_REFRESH_TOKEN,
+        "grant_type": "refresh_token"
     }
     try:
-        response = requests.post(url, json=payload, headers=headers, timeout=10)
-        if response.status_code in [200, 201]:
+        token_res = requests.post(token_url, data=token_data, timeout=10)
+        access_token = token_res.json().get("access_token")
+        if not access_token:
+            print(f"Gmail API Token Error: {token_res.text}")
+            return False
+            
+        # 2. Send email via Gmail API
+        message = MIMEText(html_content, 'html')
+        message['to'] = to_email
+        message['from'] = settings.EMAIL_HOST_USER
+        message['subject'] = subject
+        
+        raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+        
+        send_url = "https://gmail.googleapis.com/gmail/v1/users/me/messages/send"
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+        send_res = requests.post(send_url, json={"raw": raw_message}, headers=headers, timeout=10)
+        
+        if send_res.status_code == 200:
             return True
         else:
-            print(f"Resend Error: {response.text}")
+            print(f"Gmail API Send Error: {send_res.text}")
             return False
     except Exception as e:
-        print(f"Resend Request Failed: {e}")
+        print(f"Gmail API Request Failed: {e}")
         return False
 
 def send_verification_email(user, request):
@@ -610,7 +624,7 @@ def send_verification_email(user, request):
         'verify_url': verify_url,
     })
     
-    send_resend_email(subject, html_content, user.email)
+    send_gmail_api_email(subject, html_content, user.email)
 
 
 
@@ -639,7 +653,7 @@ def request_password_reset(request):
     })
 
     import threading
-    threading.Thread(target=send_resend_email, args=(subject, html_content, user.email)).start()
+    threading.Thread(target=send_gmail_api_email, args=(subject, html_content, user.email)).start()
 
     return Response({"message": "Password reset link has been sent to your email."}, status=200)
 
@@ -1059,18 +1073,18 @@ def agency_dashboard_stats(request):
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
 def test_email_sending(request):
-    """Temporary endpoint to test email connection via Resend"""
+    """Temporary endpoint to test email connection via Gmail API"""
     from django.conf import settings
     try:
-        success = send_resend_email(
-            "🧪 Test Email via Resend API",
-            "<strong>If you see this, Resend is working!</strong>",
+        success = send_gmail_api_email(
+            "🧪 Test Email via Gmail API (Free!)",
+            "<strong>If you see this, Gmail API is working perfectly!</strong>",
             settings.EMAIL_HOST_USER
         )
         if success:
-            return Response({"message": "Test email sent successfully via Resend!"})
+            return Response({"message": "Test email sent successfully via Gmail API!"})
         else:
-            return Response({"error": "Resend failed. Check backend logs."}, status=500)
+            return Response({"error": "Gmail API failed. Check backend logs."}, status=500)
     except Exception as e:
         import traceback
         return Response({

@@ -172,8 +172,10 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'travelbooking0000@gmail.com
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'mkgs pukv joyg vugw')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-# --- RESEND CONFIG ---
-RESEND_API_KEY = os.environ.get('RESEND_API_KEY', 're_FE5QEAcd_MUA1rHpCdBFLe8DJLAw85YCH')
+# --- GMAIL API CONFIG (OAuth2) ---
+GMAIL_CLIENT_ID = os.environ.get('GMAIL_CLIENT_ID')
+GMAIL_CLIENT_SECRET = os.environ.get('GMAIL_CLIENT_SECRET')
+GMAIL_REFRESH_TOKEN = os.environ.get('GMAIL_REFRESH_TOKEN')
 
 
 # FRONTEND URL
