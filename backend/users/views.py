@@ -124,7 +124,16 @@ def register(request):
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
-        send_verification_email(user, request)
+        try:
+            send_verification_email(user, request)
+        except Exception as e:
+            print(f"Email sending failed: {e}")
+            # We still return 201 because the user was created successfully
+            return Response({
+                "message": "Registration successful, but verification email could not be sent. Please contact support.",
+                "user_id": user.id
+            }, status=201)
+            
         return Response({"message": "Registration successful. Please verify your email."}, status=201)
     return Response(serializer.errors, status=400)
 
