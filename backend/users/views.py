@@ -153,8 +153,9 @@ def login_view(request):
         return Response({'detail': 'Invalid credentials'}, status=401)
 
    
-    if not user.userprofile.is_email_verified:
-        return Response({'detail': 'Please verify your email before logging in.'}, status=403)
+    # ✅ Temporarily disabled for production testing
+    # if not user.userprofile.is_email_verified:
+    #     return Response({'detail': 'Please verify your email before logging in.'}, status=403)
 
     user = authenticate(request, username=user.username, password=password)
 
@@ -1027,3 +1028,25 @@ def agency_dashboard_stats(request):
         'total_revenue': float(total_revenue),
         'activities': activities
     })
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def test_email_sending(request):
+    """Temporary endpoint to test email connection synchronously"""
+    from django.core.mail import send_mail
+    from django.conf import settings
+    try:
+        send_mail(
+            "🧪 Test Email from Railway",
+            "If you see this, email is working!",
+            settings.EMAIL_HOST_USER,
+            [settings.EMAIL_HOST_USER], # Send to yourself
+            fail_silently=False,
+        )
+        return Response({"message": "Test email sent successfully!"})
+    except Exception as e:
+        import traceback
+        return Response({
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }, status=500)

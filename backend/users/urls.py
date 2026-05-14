@@ -56,6 +56,7 @@ urlpatterns = [
     path('agency/bookings/', views.agency_bookings, name='agency_bookings'),
     path('agency/bookings/<int:booking_id>/status/', views.agency_update_booking_status, name='agency_update_booking_status'),
     path('agency/stats/', views.agency_dashboard_stats, name='agency_dashboard_stats'),
+    path('test-email/', views.test_email_sending, name='test_email_sending'),
 
    
     
