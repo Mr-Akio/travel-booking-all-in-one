@@ -894,8 +894,17 @@ def agency_package_detail(request, pk):
             context={'request': request},
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save()  
-        return Response(serializer.data)
+        obj = serializer.save()
+
+        # --- Handle Gallery (Multiple Images) ---
+        new_images = request.FILES.getlist('images')
+        if new_images:
+            # Delete old images to replace them
+            obj.images.all().delete()
+            for f in new_images:
+                TourPackageImage.objects.create(package=obj, image=f)
+
+        return Response(TourPackageSerializer(obj, context={'request': request}).data)
 
     # DELETE
     package.delete()
