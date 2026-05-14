@@ -128,14 +128,8 @@ def register(request):
         except Exception as e:
             return Response({"detail": f"Database error: {str(e)}"}, status=400)
             
-        try:
-            send_verification_email(user, request)
-        except Exception as e:
-            print(f"Email sending failed: {e}")
-            return Response({
-                "message": "Registration successful, but verification email could not be sent. Please contact support.",
-                "user_id": user.id
-            }, status=201)
+        import threading
+        threading.Thread(target=send_verification_email, args=(user, request)).start()
             
         return Response({"message": "Registration successful. Please verify your email."}, status=201)
     return Response(serializer.errors, status=400)
@@ -616,7 +610,8 @@ def request_password_reset(request):
 
     email_message = EmailMessage(subject, html_message, to=[user.email])
     email_message.content_subtype = 'html'
-    email_message.send()
+    import threading
+    threading.Thread(target=email_message.send).start()
 
     return Response({"message": "Password reset link has been sent to your email."}, status=200)
 
