@@ -45,7 +45,7 @@ urlpatterns = [
 
     
     path('blog/posts/', BlogPostListCreateView.as_view(), name='blog_posts'),
-    path('blog/posts/<slug:slug>/', BlogPostDetailView.as_view(), name='blog-detail'),
+    path('blog/posts/<str:slug>/', BlogPostDetailView.as_view(), name='blog-detail'),
     
     # AGENCY endpoints
     path('agency/packages/', views.agency_my_packages, name='agency_my_packages'),

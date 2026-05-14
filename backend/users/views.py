@@ -795,7 +795,7 @@ def create_blog_post(request):
         tags=tags,
         image=image
     )
-    return Response({'message': 'Blog created', 'id': post.id})
+    return Response({'message': 'Blog created', 'id': post.id, 'slug': post.slug})
 
 
 

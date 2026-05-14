@@ -172,16 +172,19 @@ class BlogPost(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            original_slug = slugify(self.title, allow_unicode=True)
-            unique_slug = original_slug
-            num = 1
-            # Check if slug exists and append a number if it does
-            while BlogPost.objects.filter(slug=unique_slug).exists():
-                unique_slug = f'{original_slug}-{num}'
-                num += 1
-            self.slug = unique_slug
+        # First save to get the ID if it's a new post
+        is_new = self.pk is None
         super().save(*args, **kwargs)
+        
+        # If it's new or slug is empty, generate ID-prefixed slug
+        if is_new or not self.slug:
+            original_slug = slugify(self.title, allow_unicode=True)
+            if not original_slug:
+                original_slug = "article"
+            
+            self.slug = f"{self.id}-{original_slug}"
+            # Save again with the new slug
+            super().save(update_fields=['slug'])
 
     def __str__(self):
         return self.title
