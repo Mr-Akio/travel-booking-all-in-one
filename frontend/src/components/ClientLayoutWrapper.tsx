@@ -18,9 +18,6 @@ export default function ClientLayoutWrapper({ children }: { children: React.Reac
 
   // 🛡️ Google Client ID from Environment Variables
   const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
-  
-  // ตรวจสอบค่าที่ถูกส่งเข้ามา (กด F12 ในเบราว์เซอร์เพื่อดู)
-  console.log("🔍 Current Google Client ID:", GOOGLE_CLIENT_ID);
 
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
