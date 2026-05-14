@@ -162,14 +162,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # EMAIL SETTINGS (Console Backend for Development)
 
+# --- EMAIL CONFIG ---
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
-EMAIL_HOST_USER = 'travelbooking0000@gmail.com'  
-EMAIL_HOST_PASSWORD = 'mkgs pukv joyg vugw'  
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'travelbooking0000@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'mkgs pukv joyg vugw')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# --- RESEND CONFIG ---
+RESEND_API_KEY = os.environ.get('RESEND_API_KEY', 're_FE5QEAcd_MUA1rHpCdBFLe8DJLAw85YCH')
 
 
 # FRONTEND URL

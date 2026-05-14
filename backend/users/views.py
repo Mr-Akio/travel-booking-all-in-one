@@ -558,30 +558,59 @@ class PackageReviewListView(generics.ListAPIView):
         return Review.objects.filter(package_id=package_id).order_by('-created_at')
     
     
+import requests
+import threading
+
+def send_resend_email(subject, html_content, to_email):
+    """Utility to send email via Resend API"""
+    from django.conf import settings
+    api_key = settings.RESEND_API_KEY
+    if not api_key:
+        print("RESEND_API_KEY not found")
+        return False
+        
+    url = "https://api.resend.com/emails"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "from": "Travel Booking <onboarding@resend.dev>",
+        "to": [to_email],
+        "subject": subject,
+        "html": html_content
+    }
+    try:
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        if response.status_code in [200, 201]:
+            return True
+        else:
+            print(f"Resend Error: {response.text}")
+            return False
+    except Exception as e:
+        print(f"Resend Request Failed: {e}")
+        return False
+
 def send_verification_email(user, request):
-    from rest_framework_simplejwt.tokens import RefreshToken
+    from django.utils.http import urlsafe_base64_encode
+    from django.utils.encoding import force_bytes
+    from django.contrib.auth.tokens import default_token_generator
     from django.template.loader import render_to_string
-    from django.core.mail import EmailMessage
-    from django.urls import reverse
+    from django.conf import settings
 
-    token = RefreshToken.for_user(user).access_token
-    verify_url = request.build_absolute_uri(
-        reverse('verify_email') + f"?token={str(token)}"
-    )
-
-    subject = "🎉 Email Verification for Tour Booking System"
-    html_message = render_to_string('emails/verify_email.html', {
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    
+    # Use frontend URL for verification link
+    verify_url = f"{settings.FRONTEND_URL}/verify-email?uid={uid}&token={token}"
+    
+    subject = "🌱 Verify your email address"
+    html_content = render_to_string('emails/verify_email.html', {
         'username': user.username,
         'verify_url': verify_url,
     })
-
-    email = EmailMessage(
-        subject=subject,
-        body=html_message,
-        to=[user.email],
-    )
-    email.content_subtype = 'html'  
-    email.send()
+    
+    send_resend_email(subject, html_content, user.email)
 
 
 
@@ -604,15 +633,13 @@ def request_password_reset(request):
     reset_link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
 
     subject = "🔐 Reset your password"
-    html_message = render_to_string('emails/password_reset_email.html', {
+    html_content = render_to_string('emails/password_reset_email.html', {
         'username': user.username,
         'reset_link': reset_link,
     })
 
-    email_message = EmailMessage(subject, html_message, to=[user.email])
-    email_message.content_subtype = 'html'
     import threading
-    threading.Thread(target=email_message.send).start()
+    threading.Thread(target=send_resend_email, args=(subject, html_content, user.email)).start()
 
     return Response({"message": "Password reset link has been sent to your email."}, status=200)
 
@@ -1032,6 +1059,24 @@ def agency_dashboard_stats(request):
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
 def test_email_sending(request):
+    """Temporary endpoint to test email connection via Resend"""
+    from django.conf import settings
+    try:
+        success = send_resend_email(
+            "🧪 Test Email via Resend API",
+            "<strong>If you see this, Resend is working!</strong>",
+            settings.EMAIL_HOST_USER
+        )
+        if success:
+            return Response({"message": "Test email sent successfully via Resend!"})
+        else:
+            return Response({"error": "Resend failed. Check backend logs."}, status=500)
+    except Exception as e:
+        import traceback
+        return Response({
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }, status=500)
     """Temporary endpoint to test email connection synchronously"""
     from django.core.mail import send_mail
     from django.conf import settings
