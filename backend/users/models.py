@@ -31,6 +31,19 @@ class UserProfile(models.Model):
 
 
 
+import os
+import uuid
+
+def get_file_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = "%s.%s" % (uuid.uuid4(), ext)
+    # Determine directory based on instance type
+    if isinstance(instance, TourPackage):
+        return os.path.join('packages/', filename)
+    if isinstance(instance, BlogPost):
+        return os.path.join('blog_images/', filename)
+    return os.path.join('uploads/', filename)
+
 # -----------------------
 # Tour Package
 # -----------------------
@@ -48,8 +61,8 @@ class TourPackage(models.Model):
     location = models.CharField(max_length=255)
     start_date = models.DateField()
     end_date = models.DateField()
-    image = models.ImageField(upload_to='packages/', null=True, blank=True)
-    map_image = models.ImageField(upload_to='maps/', null=True, blank=True)
+    image = models.ImageField(upload_to=get_file_path, null=True, blank=True)
+    map_image = models.ImageField(upload_to=get_file_path, null=True, blank=True)
     slots = models.PositiveIntegerField(default=20)
     available = models.BooleanField(default=True)
 
@@ -152,7 +165,7 @@ class BlogPost(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
     title = models.CharField(max_length=255)
     content = models.TextField()
-    image = models.ImageField(upload_to='blog_images/', blank=True, null=True)
+    image = models.ImageField(upload_to=get_file_path, blank=True, null=True)
     slug = models.SlugField(unique=True, blank=True, null=True)
     is_published = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

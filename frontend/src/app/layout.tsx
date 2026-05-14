@@ -1,17 +1,17 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
 import { CurrencyProvider } from "@/providers/CurrencyProvider"; 
 
-
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ["latin", "thai"],
+  variable: "--font-inter",
+});
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        
+    <html lang="th">
+      <body className={`${inter.variable} font-sans antialiased`}>
         <CurrencyProvider>
           <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
         </CurrencyProvider>
