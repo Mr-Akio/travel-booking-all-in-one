@@ -779,13 +779,6 @@ class BlogPostCreateView(APIView):
 
 
         
-class BlogPostListCreateView(generics.ListCreateAPIView):
-    queryset = BlogPost.objects.all().order_by('-created_at')
-    serializer_class = BlogPostSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
         
 class BlogPostDetailView(RetrieveAPIView):
     queryset = BlogPost.objects.all()
