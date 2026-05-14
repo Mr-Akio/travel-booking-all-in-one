@@ -110,8 +110,21 @@ async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!res.ok) {
     try {
       const data = await res.json();
-      throw new Error((data?.detail as string) || (data?.error as string) || JSON.stringify(data) || `HTTP ${res.status}`);
-    } catch {
+      let errorMsg = (data?.detail as string) || (data?.error as string);
+      
+      if (!errorMsg && typeof data === 'object' && data !== null) {
+        // Try to extract validation errors (e.g., {"email": ["..."]})
+        const values = Object.values(data);
+        if (values.length > 0) {
+          const firstErr = values[0];
+          if (Array.isArray(firstErr)) errorMsg = firstErr[0];
+          else if (typeof firstErr === 'string') errorMsg = firstErr;
+        }
+      }
+      
+      throw new Error(errorMsg || JSON.stringify(data) || `HTTP ${res.status}`);
+    } catch (e: any) {
+      if (e instanceof Error) throw e;
       throw new Error(`HTTP ${res.status}`);
     }
   }
