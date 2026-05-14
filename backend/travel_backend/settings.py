@@ -28,7 +28,7 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "True").lower() == "true"
 
 ALLOWED_HOSTS = os.environ.get(
     "DJANGO_ALLOWED_HOSTS",
-    "localhost,127.0.0.1,backend"
+    "localhost,127.0.0.1,backend,travel-booking-all-in-one-production.up.railway.app"
 ).split(",")
 
 
@@ -177,12 +177,12 @@ FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
 # CORS & CSRF Settings
 CORS_ALLOWED_ORIGINS = os.environ.get(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:3000,http://127.0.0.1:3000"
+    "http://localhost:3000,http://127.0.0.1:3000,https://accomplished-freedom-production.up.railway.app"
 ).split(",")
 
 CSRF_TRUSTED_ORIGINS = os.environ.get(
     "CSRF_TRUSTED_ORIGINS",
-    "http://localhost:3000,http://127.0.0.1:3000"
+    "http://localhost:3000,http://127.0.0.1:3000,https://accomplished-freedom-production.up.railway.app"
 ).split(",")
 
 # Media Files
