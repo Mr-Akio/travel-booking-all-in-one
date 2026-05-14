@@ -15,9 +15,8 @@ const nextConfig: NextConfig = {
       { protocol: "http", hostname: "backend",  port: "8000", pathname: "/media/**" },
       { protocol: "http", hostname: "localhost", port: "8000", pathname: "/media/**" },
       { protocol: "https", hostname: "images.unsplash.com" },
-      // 🚀 เพิ่ม Domain จริงของคุณที่นี่ (ตัวอย่างสำหรับ Demo)
-      { protocol: "https", hostname: "*.vercel.app", pathname: "/media/**" },
-      { protocol: "https", hostname: "api.travel-demo.app", pathname: "/media/**" },
+      { protocol: "http", hostname: "travel-booking-all-in-one-production.up.railway.app", pathname: "/media/**" },
+      { protocol: "https", hostname: "travel-booking-all-in-one-production.up.railway.app", pathname: "/media/**" },
     ],
   },
 };
