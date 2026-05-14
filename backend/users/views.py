@@ -126,7 +126,7 @@ def register(request):
         try:
             user = serializer.save()
         except Exception as e:
-            return Response({"detail": f"Database error: {str(e)}"}, status=500)
+            return Response({"detail": f"Database error: {str(e)}"}, status=400)
             
         try:
             send_verification_email(user, request)
