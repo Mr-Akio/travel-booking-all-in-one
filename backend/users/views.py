@@ -152,10 +152,9 @@ def login_view(request):
     except User.DoesNotExist:
         return Response({'detail': 'Invalid credentials'}, status=401)
 
-   
-    # ✅ Temporarily disabled for production testing
-    # if not user.userprofile.is_email_verified:
-    #     return Response({'detail': 'Please verify your email before logging in.'}, status=403)
+       # Enforce email verification for security
+    if not user.userprofile.is_email_verified:
+        return Response({'detail': 'Please verify your email before logging in.'}, status=403)
 
     user = authenticate(request, username=user.username, password=password)
 
@@ -514,24 +513,27 @@ def generate_qr_code(request, booking_id):
 
 @api_view(['GET'])
 def verify_email(request):
-    token_str = request.GET.get("token")
+    from django.utils.http import urlsafe_base64_decode
+    from django.utils.encoding import force_str
+    from django.contrib.auth.tokens import default_token_generator
+    
+    uidb64 = request.GET.get("uid")
+    token = request.GET.get("token")
 
     try:
-        token = AccessToken(token_str)
-        user_id = token['user_id']
-        user = User.objects.get(id=user_id)
-        user_profile = UserProfile.objects.get(user=user)
-
-        if not user_profile.is_email_verified:
-            user_profile.is_email_verified = True
-            user_profile.save()
-
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
         
-        return redirect(f"{settings.FRONTEND_URL}/verify-success")
-
-    except TokenError:
-        return redirect(f"{settings.FRONTEND_URL}/verify-failed")
-    except Exception:
+        if default_token_generator.check_token(user, token):
+            user_profile, created = UserProfile.objects.get_or_create(user=user)
+            if not user_profile.is_email_verified:
+                user_profile.is_email_verified = True
+                user_profile.save()
+            return redirect(f"{settings.FRONTEND_URL}/verify-success")
+        else:
+            return redirect(f"{settings.FRONTEND_URL}/verify-failed")
+    except Exception as e:
+        print(f"Verification Error: {e}")
         return redirect(f"{settings.FRONTEND_URL}/verify-failed")
     
 @api_view(['GET'])
@@ -615,8 +617,10 @@ def send_verification_email(user, request):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = default_token_generator.make_token(user)
     
-    # Use frontend URL for verification link
-    verify_url = f"{settings.FRONTEND_URL}/verify-email?uid={uid}&token={token}"
+    # Point directly to backend API for verification
+    # It will redirect to verify-success or verify-failed on frontend after processing
+    backend_url = "https://travel-booking-all-in-one-production.up.railway.app"
+    verify_url = f"{backend_url}/api/users/verify-email/?uid={uid}&token={token}"
     
     subject = "🌱 Verify your email address"
     html_content = render_to_string('emails/verify_email.html', {
