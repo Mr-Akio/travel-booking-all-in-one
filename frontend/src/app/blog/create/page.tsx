@@ -42,8 +42,8 @@ export default function BlogCreatePage() {
     try {
       await api.post('/api/users/blog/posts/', formData);
       router.push('/blog');
-    } catch {
-      setError('An error occurred while posting the article');
+    } catch (err: any) {
+      setError(err.message || 'An error occurred while posting the article');
     } finally {
       setLoading(false);
     }
