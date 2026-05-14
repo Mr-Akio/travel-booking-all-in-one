@@ -90,15 +90,15 @@ export default function EditPackagePage() {
            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">{msg || 'Loading package details...'}</p>
         </div>
       ) : (
-        <div className="max-w-4xl mx-auto space-y-10">
-          <div className="flex items-center justify-between">
+        <div className="max-w-4xl mx-auto space-y-6 md:space-y-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
              <div className="space-y-2">
-               <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+               <h1 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight">
                  Edit <span className="text-orange-500">Package</span>
                </h1>
-               <p className="text-slate-500 font-medium">Refine your tour details for the perfect customer experience.</p>
+               <p className="text-sm md:text-base text-slate-500 font-medium">Refine your tour details for the perfect customer experience.</p>
              </div>
-             <Link href="/agency/packages" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-orange-500 transition-colors group">
+             <Link href="/agency/packages" className="w-fit flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-orange-500 transition-colors group bg-white px-4 py-2 rounded-xl border border-slate-100 md:bg-transparent md:p-0 md:border-none">
                 <ArrowLeftIcon className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
                 Back to List
              </Link>
@@ -113,13 +113,13 @@ export default function EditPackagePage() {
 
           <form onSubmit={onSubmit} className="space-y-10">
             {/* Main Info Section */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 p-8 md:p-12 space-y-8">
-              <div className="flex items-center justify-between border-b border-slate-50 pb-6">
+            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 p-6 md:p-12 space-y-8 mx-1 md:mx-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-50 pb-6 gap-4">
                  <div className="flex items-center gap-3">
                     <InformationCircleIcon className="w-6 h-6 text-orange-500" />
-                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-widest">General Information</h2>
+                    <h2 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-widest">General Information</h2>
                  </div>
-                 <div className="flex items-center gap-4">
+                 <div className="flex items-center justify-between sm:justify-end gap-4 bg-slate-50 p-3 rounded-2xl sm:bg-transparent sm:p-0">
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Visibility Status</span>
                     <button
                       type="button"
@@ -186,7 +186,7 @@ export default function EditPackagePage() {
             </div>
 
             {/* Logistics & Timeline */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 p-8 md:p-12 space-y-8">
+            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 p-6 md:p-12 space-y-8 mx-1 md:mx-0">
               <div className="flex items-center gap-3 border-b border-slate-50 pb-6">
                  <CalendarDaysIcon className="w-6 h-6 text-orange-500" />
                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-widest">Logistics & Timeline</h2>
@@ -263,7 +263,7 @@ export default function EditPackagePage() {
             </div>
 
             {/* Media & Details */}
-            <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 p-8 md:p-12 space-y-10">
+            <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 p-6 md:p-12 space-y-10 mx-1 md:mx-0">
               <div className="flex items-center gap-3 border-b border-slate-50 pb-6">
                  <PhotoIcon className="w-6 h-6 text-orange-500" />
                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-widest">Media & Details</h2>
@@ -326,20 +326,20 @@ export default function EditPackagePage() {
                  </div>
               </div>
 
-              <div className="pt-10 border-t border-slate-50 flex items-center justify-between gap-6">
-                 <Link href="/agency/packages" className="flex-1 py-6 bg-white border border-slate-200 text-slate-600 font-black text-sm uppercase tracking-[0.3em] rounded-3xl hover:bg-slate-50 transition-all text-center">
+              <div className="pt-10 border-t border-slate-50 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+                 <Link href="/agency/packages" className="w-full md:flex-1 py-6 bg-white border border-slate-200 text-slate-600 font-black text-sm uppercase tracking-[0.3em] rounded-3xl hover:bg-slate-50 transition-all text-center">
                     Cancel
                  </Link>
                  <button
                    disabled={saving}
-                   className="flex-[2] flex items-center justify-center gap-3 py-6 bg-slate-900 text-white font-black text-sm uppercase tracking-[0.3em] rounded-3xl hover:bg-orange-500 transition-all shadow-2xl shadow-slate-200 hover:shadow-orange-100 disabled:opacity-50"
+                   className="w-full md:flex-[2] flex items-center justify-center gap-3 py-6 bg-slate-900 text-white font-black text-sm uppercase tracking-[0.3em] rounded-3xl hover:bg-orange-500 transition-all shadow-2xl shadow-slate-200 hover:shadow-orange-100 disabled:opacity-50"
                  >
-                   {saving ? (
-                     <div className="w-5 h-5 border-4 border-white border-t-transparent rounded-full animate-spin" />
-                   ) : (
-                     <CloudArrowUpIcon className="w-6 h-6" />
-                   )}
-                   {saving ? 'Syncing Changes...' : 'Save Package Changes'}
+                    {saving ? (
+                      <div className="w-5 h-5 border-4 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <CloudArrowUpIcon className="w-6 h-6" />
+                    )}
+                    {saving ? 'Syncing Changes...' : 'Save Package Changes'}
                  </button>
               </div>
             </div>

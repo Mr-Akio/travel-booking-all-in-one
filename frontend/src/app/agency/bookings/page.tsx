@@ -78,7 +78,8 @@ export default function AgencyBookingsPage() {
           <div className="bg-red-50 border border-red-100 p-10 rounded-[2.5rem] text-center text-red-600 font-bold shadow-sm">{msg}</div>
         ) : (
           <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 overflow-hidden">
-            <div className="grid grid-cols-12 gap-4 border-b border-slate-100 bg-slate-50 px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+            {/* Table Header - Desktop Only */}
+            <div className="hidden md:grid grid-cols-12 gap-4 border-b border-slate-100 bg-slate-50 px-8 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
               <div className="col-span-4">Tour Package</div>
               <div className="col-span-2">Travel Date</div>
               <div className="col-span-2 text-center">Travelers</div>
@@ -88,35 +89,56 @@ export default function AgencyBookingsPage() {
 
             <ul className="divide-y divide-slate-50">
               {items.map((b) => (
-                <li key={b.id} className="grid grid-cols-12 items-center gap-4 px-8 py-8 text-sm group hover:bg-slate-50/50 transition-colors">
-                  <div className="col-span-4">
-                    <div className="font-black text-slate-900 text-base leading-tight group-hover:text-orange-500 transition-colors">{b.package.title}</div>
-                    <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{b.package.location}</div>
+                <li key={b.id} className="flex flex-col md:grid md:grid-cols-12 items-start md:items-center gap-6 md:gap-4 px-6 md:px-8 py-8 text-sm group hover:bg-slate-50/50 transition-colors">
+                  {/* Package & Status (Mobile Header) */}
+                  <div className="w-full md:col-span-4 flex items-start justify-between md:block">
+                    <div>
+                      <div className="font-black text-slate-900 text-base leading-tight group-hover:text-orange-500 transition-colors">{b.package.title}</div>
+                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{b.package.location}</div>
+                    </div>
+                    <div className="md:hidden shrink-0">
+                      <StatusPill s={b.status} />
+                    </div>
                   </div>
-                  <div className="col-span-2 font-bold text-slate-700">{b.travel_date}</div>
-                  <div className="col-span-2 text-center">
+
+                  {/* Travel Date */}
+                  <div className="w-full md:col-span-2 flex items-center justify-between md:block border-t border-slate-50 pt-4 md:border-none md:pt-0">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest md:hidden">Travel Date</span>
+                    <div className="font-bold text-slate-700">{b.travel_date}</div>
+                  </div>
+
+                  {/* Travelers */}
+                  <div className="w-full md:col-span-2 flex items-center justify-between md:block md:text-center">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest md:hidden">Travelers</span>
                     <span className="bg-slate-100 text-slate-900 px-3 py-1 rounded-lg font-black text-xs">
-                       {b.number_of_people}
+                       {b.number_of_people} {b.number_of_people > 1 ? 'People' : 'Person'}
                     </span>
                   </div>
-                  <div className="col-span-2 text-center">
+
+                  {/* Status (Desktop) */}
+                  <div className="hidden md:block md:col-span-2 text-center">
                     <StatusPill s={b.status} />
                   </div>
-                  <div className="col-span-2 flex items-center justify-end gap-2">
-                    <button
-                      onClick={() => updateStatus(b.id, 'confirmed')}
-                      className="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-emerald-500 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all shadow-sm"
-                      title="Confirm Booking"
-                    >
-                      <CheckIcon className="w-5 h-5 stroke-[2.5]" />
-                    </button>
-                    <button
-                      onClick={() => updateStatus(b.id, 'cancelled')}
-                      className="w-10 h-10 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-sm"
-                      title="Cancel Booking"
-                    >
-                      <XMarkIcon className="w-5 h-5 stroke-[2.5]" />
-                    </button>
+
+                  {/* Actions */}
+                  <div className="w-full md:col-span-2 flex items-center justify-between md:justify-end gap-3 border-t border-slate-50 pt-4 md:border-none md:pt-0">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest md:hidden">Quick Actions</span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => updateStatus(b.id, 'confirmed')}
+                        className="w-10 h-10 md:w-9 md:h-9 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-emerald-500 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all shadow-sm"
+                        title="Confirm"
+                      >
+                        <CheckIcon className="w-5 h-5 stroke-[2.5]" />
+                      </button>
+                      <button
+                        onClick={() => updateStatus(b.id, 'cancelled')}
+                        className="w-10 h-10 md:w-9 md:h-9 flex items-center justify-center bg-white border border-slate-200 rounded-xl text-red-400 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-sm"
+                        title="Cancel"
+                      >
+                        <XMarkIcon className="w-5 h-5 stroke-[2.5]" />
+                      </button>
+                    </div>
                   </div>
                 </li>
               ))}

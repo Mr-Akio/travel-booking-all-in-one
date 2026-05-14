@@ -15,6 +15,8 @@ interface BlogPost {
   slug: string;
 }
 
+import { Skeleton } from '@/components/ui/Skeleton';
+
 export default function BlogDetailPage() {
   const { slug } = useParams();
   const router = useRouter();
@@ -41,9 +43,29 @@ export default function BlogDetailPage() {
     <div className="bg-slate-50 min-h-screen pt-24 pb-20">
       <div className="max-w-4xl mx-auto px-6">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-slate-500 font-medium">Loading story...</p>
+          <div className="space-y-12">
+            <div className="flex flex-col items-center space-y-6 text-center">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-12 w-full max-w-2xl" />
+              <div className="flex gap-4 items-center">
+                <Skeleton className="h-8 w-8 rounded-full" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+            </div>
+            <Skeleton className="h-[400px] md:h-[550px] w-full rounded-[3rem]" />
+            <div className="bg-white rounded-[3rem] p-8 md:p-16 space-y-8 border border-slate-100 shadow-sm">
+              <div className="space-y-4">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+              <div className="space-y-4">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-5/6" />
+                <Skeleton className="h-4 w-full" />
+              </div>
+            </div>
           </div>
         ) : error ? (
           <div className="bg-red-50 border border-red-100 p-10 rounded-[2.5rem] text-center">

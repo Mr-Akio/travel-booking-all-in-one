@@ -35,6 +35,9 @@ export default function AgencyPackagesPage() {
   const [debounced, setDebounced] = useState('');
   const [sort, setSort] = useState<SortKey>('newest');
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
   const [updatingIds, setUpdatingIds] = useState<Set<number>>(new Set());
 
   /** -------- Fetch -------- */
@@ -55,12 +58,15 @@ export default function AgencyPackagesPage() {
 
   /** -------- Debounce -------- */
   useEffect(() => {
-    const t = setTimeout(() => setDebounced(query.trim().toLowerCase()), 250);
+    const t = setTimeout(() => {
+      setDebounced(query.trim().toLowerCase());
+      setCurrentPage(1);
+    }, 250);
     return () => clearTimeout(t);
   }, [query]);
 
   /** -------- List: filter + sort -------- */
-  const display = useMemo(() => {
+  const filtered = useMemo(() => {
     let list = items;
 
     if (debounced) {
@@ -93,6 +99,17 @@ export default function AgencyPackagesPage() {
 
     return list;
   }, [items, debounced, sort]);
+
+  // Pagination Logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleDelete = async (id: number) => {
     if (!confirm('Delete this package?')) return;
@@ -139,21 +156,21 @@ export default function AgencyPackagesPage() {
 
   return (
     <AgencyShell>
-      <div className="space-y-10">
+      <div className="space-y-10 pb-20">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
           <div className="space-y-2">
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight">
               My <span className="text-orange-500">Packages</span>
             </h1>
-            <p className="text-slate-500 font-medium">Manage and monitor your tour collections effortlessly.</p>
+            <p className="text-sm md:text-base text-slate-500 font-medium">Manage and monitor your tour collections effortlessly.</p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="relative group">
+          <div className="flex flex-col sm:flex-row flex-wrap items-center gap-3 md:gap-4">
+            <div className="relative w-full sm:w-auto group">
               <input
                 placeholder="Search packages..."
-                className="h-14 w-full md:w-72 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 text-sm font-medium outline-none focus:ring-2 focus:ring-orange-500 transition-all shadow-sm group-hover:border-slate-300"
+                className="h-14 w-full sm:w-64 md:w-72 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 text-sm font-medium outline-none focus:ring-2 focus:ring-orange-500 transition-all shadow-sm group-hover:border-slate-300"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
@@ -162,23 +179,25 @@ export default function AgencyPackagesPage() {
               </span>
             </div>
 
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortKey)}
-              className="h-14 bg-white border border-slate-200 rounded-2xl px-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-orange-500 transition-all shadow-sm cursor-pointer"
-            >
-              <option value="newest">Latest Added</option>
-              <option value="oldest">Oldest First</option>
-              <option value="price_asc">Price: Low to High</option>
-              <option value="price_desc">Price: High to Low</option>
-            </select>
+            <div className="flex w-full sm:w-auto gap-3">
+              <select
+                value={sort}
+                onChange={(e) => setSort(e.target.value as SortKey)}
+                className="h-14 flex-1 sm:flex-none bg-white border border-slate-200 rounded-2xl px-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-orange-500 transition-all shadow-sm cursor-pointer"
+              >
+                <option value="newest">Latest</option>
+                <option value="oldest">Oldest</option>
+                <option value="price_asc">Price: Low</option>
+                <option value="price_desc">Price: High</option>
+              </select>
 
-            <Link
-              href="/agency/packages/create"
-              className="h-14 flex items-center gap-2 bg-slate-900 text-white px-8 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-500 transition-all shadow-xl shadow-slate-200 hover:shadow-orange-100"
-            >
-              <PlusIcon className="w-5 h-5 stroke-[3]" /> Create Package
-            </Link>
+              <Link
+                href="/agency/packages/create"
+                className="h-14 flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-900 text-white px-6 md:px-8 rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-orange-500 transition-all shadow-xl shadow-slate-200 hover:shadow-orange-100"
+              >
+                <PlusIcon className="w-5 h-5 stroke-[3]" /> <span className="hidden sm:inline">Create</span>
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -187,13 +206,14 @@ export default function AgencyPackagesPage() {
           <SkeletonGrid />
         ) : msg ? (
           <div className="bg-red-50 border border-red-100 p-10 rounded-[2.5rem] text-center text-red-600 font-bold shadow-sm">{msg}</div>
-        ) : display.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <EmptyState onCreateHref="/agency/packages/create" />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {display.map((p) => {
-              const available = (p as unknown as { available?: boolean }).available ?? false;
-              const saving = updatingIds.has(p.id);
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+              {currentItems.map((p) => {
+                const available = (p as unknown as { available?: boolean }).available ?? false;
+                const saving = updatingIds.has(p.id);
 
               return (
                 <div
@@ -301,7 +321,28 @@ export default function AgencyPackagesPage() {
               );
             })}
           </div>
-        )}
+
+          {/* Pagination Buttons */}
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-4 mt-16">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-200 disabled:opacity-30 disabled:hover:bg-orange-500 active:scale-95"
+              >
+                <span className="text-lg">‹</span> Previous
+              </button>
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="flex items-center gap-2 bg-orange-500 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-200 disabled:opacity-30 disabled:hover:bg-orange-500 active:scale-95"
+              >
+                Next <span className="text-lg">›</span>
+              </button>
+            </div>
+          )}
+        </>
+      )}
       </div>
     </AgencyShell>
   );

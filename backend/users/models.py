@@ -160,7 +160,14 @@ class BlogPost(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title, allow_unicode=True)
+            original_slug = slugify(self.title, allow_unicode=True)
+            unique_slug = original_slug
+            num = 1
+            # Check if slug exists and append a number if it does
+            while BlogPost.objects.filter(slug=unique_slug).exists():
+                unique_slug = f'{original_slug}-{num}'
+                num += 1
+            self.slug = unique_slug
         super().save(*args, **kwargs)
 
     def __str__(self):

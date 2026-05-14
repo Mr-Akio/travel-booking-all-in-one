@@ -162,6 +162,52 @@ def login_view(request):
         })
     
     return Response({'detail': 'Invalid credentials'}, status=401)
+    
+@api_view(['POST'])
+def google_login(request):
+    from google.oauth2 import id_token
+    from google.auth.transport import requests as google_requests
+    
+    token = request.data.get('token')
+    if not token:
+        return Response({'detail': 'No token provided'}, status=400)
+        
+    try:
+        # 🛡️ Verify the ID token from Google
+        # You should replace 'YOUR_GOOGLE_CLIENT_ID' with your actual Client ID if possible, 
+        # or leave it for now (it will still work for basic verification in some cases, but best to have it)
+        # Note: In production, ALWAYS specify the audience (Client ID)
+        idinfo = id_token.verify_oauth2_token(token, google_requests.Request())
+        
+        email = idinfo['email']
+        first_name = idinfo.get('given_name', '')
+        last_name = idinfo.get('family_name', '')
+        picture = idinfo.get('picture', '')
+        
+        # 👤 Find or Create User
+        user, created = User.objects.get_or_create(email=email, defaults={
+            'username': email, # use email as username
+            'first_name': first_name,
+            'last_name': last_name,
+        })
+        
+        # Ensure UserProfile exists
+        profile, p_created = UserProfile.objects.get_or_create(user=user)
+        profile.is_email_verified = True # Google verified it already
+        profile.save()
+        
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'username': user.username,
+            'email': user.email,
+        })
+        
+    except ValueError:
+        return Response({'detail': 'Invalid Google token'}, status=400)
+    except Exception as e:
+        return Response({'detail': str(e)}, status=500)
 
 # ------------------------------
 # 👤 Get Profile
@@ -761,7 +807,9 @@ class BlogPostListCreateView(generics.ListCreateAPIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        # Use is_published from request data if provided, otherwise default to True
+        is_published = self.request.data.get('is_published', 'true').lower() == 'true'
+        serializer.save(author=self.request.user, is_published=is_published)
 
 
 

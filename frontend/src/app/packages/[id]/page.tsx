@@ -59,6 +59,8 @@ function writeWishlist(ids: number[]) {
   localStorage.setItem('wishlist', JSON.stringify(Array.from(new Set(ids))));
 }
 
+import { Skeleton } from '@/components/ui/Skeleton';
+
 export default function PackageDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -70,6 +72,7 @@ export default function PackageDetailPage() {
   const [people, setPeople] = useState(1);
   const [message, setMessage] = useState('');
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { format } = useCurrency();
 
   useEffect(() => {
@@ -87,6 +90,8 @@ export default function PackageDetailPage() {
         setSelectedPath(pickCoverPath(data));
       } catch {
         setMessage('❌ Failed to fetch package');
+      } finally {
+        setLoading(false);
       }
     })();
   }, [id]);
@@ -143,7 +148,54 @@ export default function PackageDetailPage() {
     setTimeout(() => setMessage(''), 1200);
   };
 
-  if (!tour) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (!tour && loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 pt-24">
+        <Skeleton className="w-full h-[250px] md:h-[450px] rounded-none" />
+        <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            <div className="bg-white rounded-2xl p-4 md:p-8 space-y-8 border border-slate-200 shadow-sm">
+              <Skeleton className="h-[250px] md:h-[400px] w-full rounded-xl" />
+              <div className="flex gap-4 overflow-x-auto pb-2">
+                 {[1,2,3].map(i => <Skeleton key={i} className="h-16 md:h-20 w-24 md:w-28 shrink-0 rounded-lg" />)}
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 border-y border-slate-100">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="space-y-2">
+                    <Skeleton className="h-3 w-12 md:w-16" />
+                    <Skeleton className="h-4 w-20 md:w-24" />
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-4">
+                <Skeleton className="h-6 w-40" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+              </div>
+            </div>
+          </div>
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-2xl p-6 md:p-8 space-y-6 border border-slate-200 shadow-sm lg:sticky lg:top-28">
+               <Skeleton className="h-6 w-40" />
+               <div className="space-y-2">
+                 <Skeleton className="h-3 w-20" />
+                 <Skeleton className="h-10 w-full" />
+               </div>
+               <div className="pt-6 border-t border-slate-100 flex justify-between items-end">
+                  <div className="space-y-2">
+                    <Skeleton className="h-3 w-16" />
+                    <Skeleton className="h-8 w-24" />
+                  </div>
+               </div>
+               <Skeleton className="h-14 w-full rounded-xl" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!tour) return <div className="min-h-screen flex items-center justify-center text-slate-500 font-bold">Package not found.</div>;
 
   const agencyLabel = tour.agency_name ?? tour.owner_username ?? '—';
   const mapImageUrl = mediaUrl(tour.map_image);
@@ -151,29 +203,29 @@ export default function PackageDetailPage() {
   return (
     <div className="min-h-screen bg-slate-50 pt-24">
       {/* Simple Hero Section */}
-      <div className="relative w-full h-[450px]">
+      <div className="relative w-full h-[300px] md:h-[450px]">
         {heroUrl ? (
           <Image src={heroUrl} alt={tour.title} fill className="object-cover" priority sizes="100vw" />
         ) : (
           <div className="grid h-full w-full place-items-center bg-slate-200">No Image</div>
         )}
         <div className="absolute inset-0 bg-black/40" />
-        <div className="absolute bottom-10 left-0 w-full">
+        <div className="absolute bottom-6 md:bottom-10 left-0 w-full">
            <div className="max-w-7xl mx-auto px-6">
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">{tour.title}</h1>
-              <p className="text-gray-200">By {agencyLabel} • {tour.location}</p>
+              <h1 className="text-2xl md:text-5xl font-bold text-white mb-2 leading-tight">{tour.title}</h1>
+              <p className="text-gray-200 text-sm md:text-base">By {agencyLabel} • {tour.location}</p>
            </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left: Details */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-200">
+          <div className="bg-white rounded-2xl p-4 md:p-8 shadow-sm border border-slate-200">
             {/* Gallery */}
             <div className="mb-8">
-              <div className="relative w-full h-[400px] rounded-xl overflow-hidden">
+              <div className="relative w-full h-[250px] md:h-[400px] rounded-xl overflow-hidden">
                 {galleryUrl ? (
                   <Image src={galleryUrl} alt={tour.title} fill className="object-cover" />
                 ) : (

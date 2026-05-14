@@ -51,36 +51,36 @@ export default function CreatePackagePage() {
 
   return (
     <AgencyShell>
-      <div className="max-w-4xl mx-auto space-y-10">
-        <div className="flex items-center justify-between">
+      <div className="max-w-4xl mx-auto space-y-6 md:space-y-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
            <div className="space-y-2">
-             <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+             <h1 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight">
                Create <span className="text-orange-500">New Package</span>
              </h1>
-             <p className="text-slate-500 font-medium">Design an unforgettable journey for your customers.</p>
+             <p className="text-sm md:text-base text-slate-500 font-medium">Design an unforgettable journey for your customers.</p>
            </div>
-           <Link href="/agency/packages" className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-orange-500 transition-colors group">
+           <Link href="/agency/packages" className="w-fit flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-orange-500 transition-colors group bg-white px-4 py-2 rounded-xl border border-slate-100 md:bg-transparent md:p-0 md:border-none">
               <ArrowLeftIcon className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
               Back to List
            </Link>
         </div>
 
         {msg && (
-          <div className="bg-red-50 border border-red-100 p-6 rounded-2xl text-red-600 font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-sm">
+          <div className="bg-red-50 border border-red-100 p-6 rounded-2xl text-red-600 font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-sm mx-4 md:mx-0">
              <ExclamationTriangleIcon className="w-5 h-5" />
              {msg}
           </div>
         )}
 
-        <form onSubmit={onSubmit} className="space-y-10">
+        <form onSubmit={onSubmit} className="space-y-8 md:space-y-10">
           {/* Main Info Section */}
-          <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 p-8 md:p-12 space-y-8">
-            <div className="flex items-center justify-between border-b border-slate-50 pb-6">
+          <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 p-6 md:p-12 space-y-8 mx-1 md:mx-0">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-50 pb-6 gap-4">
                <div className="flex items-center gap-3">
                   <InformationCircleIcon className="w-6 h-6 text-orange-500" />
-                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-widest">General Information</h2>
+                  <h2 className="text-lg md:text-xl font-black text-slate-900 uppercase tracking-widest">General Information</h2>
                </div>
-               <div className="flex items-center gap-4">
+               <div className="flex items-center justify-between sm:justify-end gap-4 bg-slate-50 p-3 rounded-2xl sm:bg-transparent sm:p-0">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Set as Available</span>
                   <button
                     type="button"
@@ -121,7 +121,7 @@ export default function CreatePackagePage() {
           </div>
 
           {/* Logistics & Timeline */}
-          <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 p-8 md:p-12 space-y-8">
+          <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 p-6 md:p-12 space-y-8 mx-1 md:mx-0">
             <div className="flex items-center gap-3 border-b border-slate-50 pb-6">
                <CalendarDaysIcon className="w-6 h-6 text-orange-500" />
                <h2 className="text-xl font-black text-slate-900 uppercase tracking-widest">Logistics & Timeline</h2>
@@ -163,7 +163,7 @@ export default function CreatePackagePage() {
           </div>
 
           {/* Media & Details */}
-          <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 p-8 md:p-12 space-y-10">
+          <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 shadow-xl shadow-slate-100 p-6 md:p-12 space-y-10 mx-1 md:mx-0">
             <div className="flex items-center gap-3 border-b border-slate-50 pb-6">
                <PhotoIcon className="w-6 h-6 text-orange-500" />
                <h2 className="text-xl font-black text-slate-900 uppercase tracking-widest">Media & Details</h2>

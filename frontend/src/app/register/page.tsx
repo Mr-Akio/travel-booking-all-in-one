@@ -7,7 +7,8 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast, Toaster } from 'react-hot-toast';
-import { api } from '@/lib/api';
+import { api, API_BASE, setToken, setRefreshToken } from '@/lib/api';
+import { GoogleLogin } from '@react-oauth/google';
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -20,6 +21,36 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_BASE}/api/users/google-login/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: credentialResponse.credential }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data?.detail || 'Google Login failed');
+        return;
+      }
+
+      setToken(data.access);
+      if (data.refresh) {
+        setRefreshToken(data.refresh);
+      }
+
+      const me = await api.get<{ is_agency: boolean }>('/api/users/profile/');
+      toast.success('Login successful via Google!', { duration: 1200 });
+      router.replace(me.is_agency ? '/agency' : '/');
+    } catch {
+      toast.error('Connection error with Google Login.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,13 +92,16 @@ export default function RegisterPage() {
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-2 tracking-tight">Get Started</h2>
             <p className="text-slate-500 font-medium mb-10 text-sm md:text-base leading-relaxed">Create your account to start booking your dream trips.</p>
 
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              <button className="flex items-center justify-center border border-slate-200 py-3 rounded-2xl hover:bg-slate-50 transition-all">
-                <FontAwesomeIcon icon={faGoogle} className="w-4 h-4 text-red-500" />
-              </button>
-              <button className="flex items-center justify-center border border-slate-200 py-3 rounded-2xl hover:bg-slate-50 transition-all">
-                <FontAwesomeIcon icon={faFacebook} className="w-4 h-4 text-blue-600" />
-              </button>
+            <div className="mb-8 flex flex-col gap-4">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => toast.error('Google registration failed')}
+                useOneTap
+                shape="pill"
+                theme="outline"
+                size="large"
+                width="100%"
+              />
             </div>
 
             <div className="relative my-8 w-full text-center flex items-center">

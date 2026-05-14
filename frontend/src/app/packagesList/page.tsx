@@ -40,8 +40,18 @@ type Theme = typeof THEME_OPTIONS[number];
 const DURATION_OPTIONS = ['0–3 hours', '3–5 hours', 'Multi-day'] as const;
 type DurationBucket = typeof DURATION_OPTIONS[number];
 
+import { Skeleton } from '@/components/ui/Skeleton';
+
+function cx(...cls: (string | false | undefined)[]) {
+  return cls.filter(Boolean).join(' ');
+}
+
 export default function PackagesPage() {
   const [packages, setPackages] = useState<TourPackage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
   
   const [query, setQuery] = useState('');
   const [dateFrom, setDateFrom] = useState('');
@@ -59,6 +69,8 @@ export default function PackagesPage() {
          setPackages(data);
        } catch {
          setPackages([]);
+       } finally {
+         setLoading(false);
        }
     })();
   }, []);
@@ -114,10 +126,21 @@ export default function PackagesPage() {
     });
   }, [packages, query, dateFrom, dateTo, themes, durations, wishlistOnly, wishlist]);
 
+  // Pagination Logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 300, behavior: 'smooth' });
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen pt-24">
       {/* Hero Header */}
-      <div className="relative h-[400px] w-full flex items-center justify-center overflow-hidden">
+      <div className="relative h-[300px] md:h-[400px] w-full flex items-center justify-center overflow-hidden">
         <Image
           src="/images/autumn-season-mountain-fuji-kawaguchiko-lake-japan.jpg"
           alt="Packages Hero"
@@ -127,17 +150,26 @@ export default function PackagesPage() {
         />
         <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px]" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 drop-shadow-2xl">Discover Your <span className="text-orange-400">Next Adventure</span></h1>
-          <p className="text-slate-200 text-lg md:text-xl max-w-2xl mx-auto font-medium">Explore our handpicked collection of premium tour packages tailored for your dream getaway.</p>
+          <h1 className="text-3xl md:text-6xl font-black text-white mb-4 drop-shadow-2xl">Discover Your <span className="text-orange-400">Next Adventure</span></h1>
+          <p className="text-slate-200 text-base md:text-xl max-w-2xl mx-auto font-medium">Explore our handpicked collection of premium tour packages tailored for your dream getaway.</p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-4 gap-10">
+      <div className="max-w-7xl mx-auto px-4 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-4 gap-10">
         
         {/* Sidebar Filter */}
-        <aside className="lg:col-span-1 space-y-8 h-fit sticky top-28">
-          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+        <aside className={cx(
+          "lg:col-span-1 space-y-8 h-fit lg:sticky lg:top-28 transition-all duration-300",
+          isFilterOpen ? "block" : "hidden lg:block"
+        )}>
+          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative">
+            <button 
+              onClick={() => setIsFilterOpen(false)}
+              className="lg:hidden absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
             <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
               <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
               Search & Filter
@@ -151,7 +183,7 @@ export default function PackagesPage() {
                   placeholder="Keyword..."
                   className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-slate-700 focus:ring-2 focus:ring-orange-500 outline-none"
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => { setQuery(e.target.value); setCurrentPage(1); }}
                 />
               </div>
 
@@ -161,13 +193,13 @@ export default function PackagesPage() {
                   <input
                     type="date"
                     value={dateFrom}
-                    onChange={(e) => setDateFrom(e.target.value)}
+                    onChange={(e) => { setDateFrom(e.target.value); setCurrentPage(1); }}
                     className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-slate-700 outline-none focus:ring-1 focus:ring-orange-200"
                   />
                   <input
                     type="date"
                     value={dateTo}
-                    onChange={(e) => setDateTo(e.target.value)}
+                    onChange={(e) => { setDateTo(e.target.value); setCurrentPage(1); }}
                     className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-slate-700 outline-none focus:ring-1 focus:ring-orange-200"
                   />
                 </div>
@@ -182,7 +214,7 @@ export default function PackagesPage() {
                         type="checkbox"
                         className="w-5 h-5 rounded border-slate-300 text-orange-500 focus:ring-orange-500"
                         checked={themes.has(theme)}
-                        onChange={() => toggleTheme(theme)}
+                        onChange={() => { toggleTheme(theme); setCurrentPage(1); }}
                       />
                       <span className="text-sm text-slate-600 group-hover:text-orange-600 transition-colors">{theme}</span>
                     </label>
@@ -197,7 +229,7 @@ export default function PackagesPage() {
                     type="checkbox"
                     className="w-5 h-5 rounded border-slate-300 text-pink-500 focus:ring-pink-500"
                     checked={wishlistOnly}
-                    onChange={(e) => setWishlistOnly(e.target.checked)}
+                    onChange={(e) => { setWishlistOnly(e.target.checked); setCurrentPage(1); }}
                   />
                   <label htmlFor="wishlistOnly" className="text-sm font-bold text-slate-700 cursor-pointer">Wishlist Only ❤️</label>
                 </div>
@@ -207,6 +239,7 @@ export default function PackagesPage() {
                   onClick={() => {
                     setQuery(''); setDateFrom(''); setDateTo('');
                     setThemes(new Set()); setDurations(new Set()); setWishlistOnly(false);
+                    setCurrentPage(1);
                   }}
                   className="w-full py-3 rounded-xl border border-slate-200 text-slate-500 font-bold text-xs uppercase hover:bg-slate-50 transition-colors"
                 >
@@ -221,91 +254,151 @@ export default function PackagesPage() {
         <main className="lg:col-span-3">
           <div className="flex items-center justify-between mb-8">
             <p className="text-slate-500 font-medium">Found <span className="text-slate-900 font-bold">{filtered.length}</span> packages</p>
+            
+            <button 
+              onClick={() => setIsFilterOpen(true)}
+              className="lg:hidden flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all active:scale-95"
+            >
+              <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Filters
+            </button>
           </div>
 
           <div className="space-y-8">
-            {filtered.length === 0 ? (
+            {loading ? (
+               [1,2,3,4,5].map(i => (
+                 <div key={i} className="bg-white rounded-[2rem] border border-slate-100 overflow-hidden flex flex-col md:flex-row shadow-sm">
+                    <Skeleton className="w-full md:w-80 h-64 md:h-80 rounded-none" />
+                    <div className="flex-1 p-8 space-y-6 flex flex-col justify-between">
+                       <div className="space-y-4">
+                          <div className="flex gap-2">
+                             <Skeleton className="h-5 w-20 rounded-full" />
+                             <Skeleton className="h-5 w-24 rounded-full" />
+                          </div>
+                          <Skeleton className="h-8 w-3/4" />
+                          <div className="flex gap-4">
+                             <Skeleton className="h-4 w-32" />
+                             <Skeleton className="h-4 w-32" />
+                          </div>
+                       </div>
+                       <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
+                          <div className="space-y-2">
+                             <Skeleton className="h-3 w-20" />
+                             <Skeleton className="h-8 w-32" />
+                          </div>
+                          <Skeleton className="h-14 w-40 rounded-2xl" />
+                       </div>
+                    </div>
+                 </div>
+               ))
+            ) : filtered.length === 0 ? (
               <div className="bg-white rounded-3xl p-20 text-center border border-dashed border-slate-200">
                 <p className="text-slate-400 text-lg italic">No tour packages match your criteria.</p>
               </div>
             ) : (
-              filtered.map((pkg) => {
-                const coverUrl = mediaUrl(getCoverPath(pkg)); 
-                const wished = wishlist.has(pkg.id);
+              <>
+                <div className="space-y-8">
+                  {currentItems.map((pkg) => {
+                    const coverUrl = mediaUrl(getCoverPath(pkg)); 
+                    const wished = wishlist.has(pkg.id);
 
-                return (
-                  <div
-                    key={pkg.id}
-                    className="group bg-white rounded-[2rem] border border-slate-100 card-shadow overflow-hidden flex flex-col md:flex-row"
-                  >
-                    <div className="relative w-full md:w-80 h-64 md:h-auto overflow-hidden">
-                      {coverUrl ? (
-                        <Image
-                          src={coverUrl}
-                          alt={pkg.title}
-                          fill
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
-                          sizes="(max-width:768px) 100vw, 400px"
-                        />
-                      ) : (
-                        <div className="grid h-full w-full place-items-center bg-slate-100 text-slate-400">
-                          No Photo
-                        </div>
-                      )}
-                      <button
-                        onClick={(e) => { e.preventDefault(); toggleWishlist(pkg.id); }}
-                        className={`absolute top-4 left-4 p-3 rounded-2xl backdrop-blur-md transition-all ${
-                          wished ? 'bg-pink-500 text-white shadow-lg' : 'bg-white/70 text-slate-600 hover:bg-white'
-                        }`}
+                    return (
+                      <div
+                        key={pkg.id}
+                        className="group bg-white rounded-[2rem] border border-slate-100 card-shadow overflow-hidden flex flex-col md:flex-row transition-all hover:-translate-y-1"
                       >
-                        <svg className={`w-5 h-5 ${wished ? 'fill-current' : 'fill-none'}`} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                      </button>
-                    </div>
-
-                    <div className="flex-1 p-8 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-3">
-                           <span className="px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-[10px] font-black uppercase tracking-widest">
-                             {pkg.location}
-                           </span>
-                           <span className="text-slate-300">•</span>
-                           <span className="text-xs text-slate-500 font-medium">
-                             {pkg.duration_detail || 'Standard Tour'}
-                           </span>
-                        </div>
-                        <h3 className="text-2xl font-bold text-slate-800 mb-4 group-hover:text-orange-500 transition-colors">
-                          {pkg.title}
-                        </h3>
-                        <div className="flex flex-wrap gap-4 text-sm text-slate-500 font-medium mb-6">
-                           <div className="flex items-center gap-1">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                              {pkg.start_date ?? '-'}
-                           </div>
-                           <div className="flex items-center gap-1 text-slate-300">|</div>
-                           <div className="flex items-center gap-1">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                              {pkg.location}
-                           </div>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-slate-50 gap-4">
-                        <div className="flex flex-col items-center sm:items-start">
-                           <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Price starting at</span>
-                           <span className="text-3xl font-black text-slate-900 leading-none">
-                              {Number(pkg.price).toLocaleString()} <span className="text-lg">฿</span>
-                           </span>
-                        </div>
-                        <Link href={`/packages/${pkg.id}`} className="w-full sm:w-auto">
-                          <button className="w-full bg-slate-900 text-white hover:bg-orange-600 px-8 py-4 rounded-2xl font-bold text-sm transition-all shadow-xl shadow-slate-200 hover:shadow-orange-100 uppercase tracking-wider">
-                            View Tour Details
+                        <div className="relative w-full md:w-80 h-64 md:h-auto overflow-hidden">
+                          {coverUrl ? (
+                            <Image
+                              src={coverUrl}
+                              alt={pkg.title}
+                              fill
+                              className="object-cover transition-transform duration-700 group-hover:scale-110"
+                              sizes="(max-width:768px) 100vw, 400px"
+                            />
+                          ) : (
+                            <div className="grid h-full w-full place-items-center bg-slate-100 text-slate-400">
+                              No Photo
+                            </div>
+                          )}
+                          <button
+                            onClick={(e) => { e.preventDefault(); toggleWishlist(pkg.id); }}
+                            className={`absolute top-4 left-4 p-3 rounded-2xl backdrop-blur-md transition-all ${
+                              wished ? 'bg-pink-500 text-white shadow-lg' : 'bg-white/70 text-slate-600 hover:bg-white'
+                            }`}
+                          >
+                            <svg className={`w-5 h-5 ${wished ? 'fill-current' : 'fill-none'}`} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                           </button>
-                        </Link>
+                        </div>
+
+                        <div className="flex-1 p-6 md:p-8 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center gap-2 mb-3">
+                               <span className="px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-[10px] font-black uppercase tracking-widest">
+                                 {pkg.location}
+                               </span>
+                               <span className="text-slate-300">•</span>
+                               <span className="text-xs text-slate-500 font-medium">
+                                 {pkg.duration_detail || 'Standard Tour'}
+                               </span>
+                            </div>
+                            <h3 className="text-xl md:text-2xl font-bold text-slate-800 mb-4 group-hover:text-orange-500 transition-colors">
+                              {pkg.title}
+                            </h3>
+                            <div className="flex flex-wrap gap-4 text-sm text-slate-500 font-medium mb-6">
+                               <div className="flex items-center gap-1">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                  {pkg.start_date ?? '-'}
+                               </div>
+                               <div className="flex items-center gap-1 text-slate-300">|</div>
+                               <div className="flex items-center gap-1">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                  {pkg.location}
+                               </div>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-slate-50 gap-4">
+                            <div className="flex flex-col items-center sm:items-start">
+                               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Price starting at</span>
+                               <span className="text-2xl md:text-3xl font-black text-slate-900 leading-none">
+                                  {Number(pkg.price).toLocaleString()} <span className="text-lg">฿</span>
+                               </span>
+                            </div>
+                            <Link href={`/packages/${pkg.id}`} className="w-full sm:w-auto">
+                              <button className="w-full bg-slate-900 text-white hover:bg-orange-600 px-8 py-4 rounded-2xl font-bold text-sm transition-all shadow-xl shadow-slate-200 hover:shadow-orange-100 uppercase tracking-wider">
+                                View Tour Details
+                              </button>
+                            </Link>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    );
+                  })}
+                </div>
+
+                {/* Pagination Buttons */}
+                {totalPages > 1 && (
+                  <div className="flex justify-center gap-4 mt-16">
+                    <button
+                      onClick={() => paginate(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-200 disabled:opacity-30 disabled:hover:bg-orange-500 active:scale-95"
+                    >
+                      <span className="text-lg">‹</span> Previous
+                    </button>
+                    <button
+                      onClick={() => paginate(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="flex items-center gap-2 bg-orange-500 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-200 disabled:opacity-30 disabled:hover:bg-orange-500 active:scale-95"
+                    >
+                      Next <span className="text-lg">›</span>
+                    </button>
                   </div>
-                );
-              })
+                )}
+              </>
             )}
           </div>
         </main>

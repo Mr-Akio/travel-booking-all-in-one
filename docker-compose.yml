@@ -19,6 +19,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
         NEXT_PUBLIC_IMG_BASE: ${NEXT_PUBLIC_IMG_BASE}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     container_name: travel_frontend
     ports:
       - "3000:3000"

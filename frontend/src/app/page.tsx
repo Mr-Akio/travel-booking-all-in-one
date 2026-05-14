@@ -27,6 +27,8 @@ type TourPackage = {
 export default function HomePage() {
   const [packages, setPackages] = useState<TourPackage[] | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
   const { format } = useCurrency();
 
   useEffect(() => {
@@ -52,8 +54,19 @@ export default function HomePage() {
     );
   }, [packages, searchTerm]);
 
-  // Limit to 2 rows (8 items)
-  const displayPackages = useMemo(() => filtered.slice(0, 8), [filtered]);
+  // Pagination Logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    const element = document.getElementById('tour-section');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   function getCoverPath(pkg: TourPackage): string | null {
     return pkg.image ?? pkg.images?.[0]?.image ?? null;
@@ -67,29 +80,29 @@ export default function HomePage() {
         style={{ backgroundImage: "url('/images/pexels-fabianwiktor-994605.jpg')" }}
       >
         <div className="absolute inset-0 bg-black/40" />
-        <div className="relative z-10 flex h-full flex-col items-center justify-center px-4 text-center">
-          <h1 className="mb-6 text-4xl md:text-6xl font-bold leading-tight text-white drop-shadow-md">
-            Let&apos;s make your dream trip come true
-            <br /> wherever you want to go.
+        <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center">
+          <h1 className="mb-8 text-3xl sm:text-4xl md:text-6xl font-black leading-tight text-white drop-shadow-lg tracking-tight">
+            Let&apos;s make your <span className="text-orange-400">dream trip</span>
+            <br className="hidden md:block" /> come true wherever you want.
           </h1>
           
-          <div className="flex flex-wrap justify-center gap-2 bg-white/10 p-2 rounded-2xl backdrop-blur-sm border border-white/20">
-            <div className="relative">
+          <div className="flex flex-col md:flex-row justify-center gap-3 bg-white/10 p-3 md:p-2 rounded-3xl backdrop-blur-md border border-white/20 w-full max-w-2xl">
+            <div className="relative flex-1">
               <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input
                 type="text"
                 placeholder="Where to?"
-                className="rounded-xl bg-white pl-12 pr-6 py-4 text-lg text-black focus:outline-none w-full md:w-80 shadow-sm"
+                className="rounded-2xl bg-white pl-12 pr-6 py-4 text-base md:text-lg text-black focus:outline-none w-full shadow-sm"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <select className="rounded-xl bg-white px-6 py-4 text-lg text-black focus:outline-none shadow-sm cursor-pointer appearance-none">
+            <select className="rounded-2xl bg-white px-6 py-4 text-base md:text-lg text-black focus:outline-none shadow-sm cursor-pointer appearance-none">
               <option>Travel Type</option>
               <option>Adventure</option>
               <option>Relaxing</option>
             </select>
-            <button className="rounded-xl bg-orange-500 px-10 py-4 text-lg font-bold text-white hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-200">
+            <button className="rounded-2xl bg-orange-500 px-10 py-4 text-base md:text-lg font-black text-white hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20 active:scale-95">
               Search
             </button>
           </div>
@@ -97,7 +110,7 @@ export default function HomePage() {
       </section>
 
       {/* Packages Section (Original Design with Limit) */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <section id="tour-section" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="mb-12 flex justify-between items-end">
            <div>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-800">
@@ -107,18 +120,18 @@ export default function HomePage() {
               <div className="h-1.5 w-20 bg-orange-500 mt-4 rounded-full"></div>
            </div>
            <Link href="/packagesList" className="text-orange-500 font-bold hover:underline hidden md:block">
-              View all packages →
+              Explore all destinations →
            </Link>
         </div>
 
         {!packages ? (
           <p className="text-center text-slate-500 py-20">Loading packages...</p>
-        ) : displayPackages.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <p className="text-center text-slate-400 py-20 italic">No tour packages found</p>
         ) : (
           <div className="space-y-12">
             <div className="grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-4">
-              {displayPackages.map((pkg) => {
+              {currentItems.map((pkg) => {
                 const priceTHB = Number(pkg.price) || 0;
                 const coverUrl = mediaUrl(getCoverPath(pkg));
 
@@ -175,13 +188,25 @@ export default function HomePage() {
               })}
             </div>
 
-            {/* View More Button */}
-            <div className="flex justify-center mt-12">
-               <Link href="/packagesList" className="inline-flex items-center gap-2 bg-white border-2 border-orange-500 text-orange-500 px-8 py-3 rounded-xl font-bold hover:bg-orange-500 hover:text-white transition-all">
-                  View More Packages
-                  <ArrowRightIcon className="w-5 h-5" />
-               </Link>
-            </div>
+            {/* Pagination Buttons */}
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-4 mt-16 border-t border-slate-100 pt-10">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-200 disabled:opacity-30 disabled:hover:bg-orange-500 active:scale-95"
+                >
+                  <span className="text-lg">‹</span> Previous
+                </button>
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="flex items-center gap-2 bg-orange-500 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-200 disabled:opacity-30 disabled:hover:bg-orange-500 active:scale-95"
+                >
+                  Next <span className="text-lg">›</span>
+                </button>
+              </div>
+            )}
           </div>
         )}
       </section>

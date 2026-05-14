@@ -1,5 +1,12 @@
-export const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/').replace(/\/+$/, '');
-export const IMG_BASE = (process.env.NEXT_PUBLIC_IMG_BASE || 'http://localhost:8000').replace(/\/+$/, '');
+const isServer = typeof window === 'undefined';
+const PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const PUBLIC_IMG_BASE = process.env.NEXT_PUBLIC_IMG_BASE || 'http://localhost:8000';
+
+// In Docker local dev, server-side code needs to talk to 'backend:8000' directly
+const INTERNAL_API_URL = 'http://backend:8000';
+
+export const API_BASE = (isServer ? (process.env.INTERNAL_API_URL || INTERNAL_API_URL) : PUBLIC_API_URL).replace(/\/+$/, '');
+export const IMG_BASE = (isServer ? (process.env.INTERNAL_API_URL || INTERNAL_API_URL) : PUBLIC_IMG_BASE).replace(/\/+$/, '');
 
 function isBrowser() { return typeof window !== 'undefined'; }
 

@@ -7,6 +7,7 @@ urlpatterns = [
     # Auth
     path('register/', views.register),
     path('login/', views.login_view),
+    path('google-login/', views.google_login),
 
     # Profile
     path('me/', views.get_profile),

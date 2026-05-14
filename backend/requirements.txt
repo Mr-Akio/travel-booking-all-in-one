@@ -9,3 +9,5 @@ qrcode
 reportlab
 psycopg2-binary
 whitenoise
+google-auth
+requests
