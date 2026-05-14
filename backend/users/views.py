@@ -145,8 +145,11 @@ def login_view(request):
     except User.DoesNotExist:
         return Response({'detail': 'Invalid credentials'}, status=401)
 
-   
-    if not user.userprofile.is_email_verified:
+    # Ensure profile exists
+    from .models import UserProfile
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    
+    if not profile.is_email_verified:
         return Response({'detail': 'Please verify your email before logging in.'}, status=403)
 
     user = authenticate(request, username=user.username, password=password)
