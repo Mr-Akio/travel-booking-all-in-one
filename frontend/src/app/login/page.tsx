@@ -91,15 +91,16 @@ export default function LoginPage() {
             <p className="text-slate-500 font-medium mb-10 text-sm md:text-base leading-relaxed">Sign in to manage your bookings and explore new trips.</p>
 
             <div className="mb-8 flex flex-col gap-4">
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => toast.error('Google Login failed')}
-                useOneTap
-                shape="pill"
-                theme="outline"
-                size="large"
-                width="100%"
-              />
+              <div className="w-full flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => toast.error('Google Login failed')}
+                  useOneTap
+                  theme="outline"
+                  shape="rectangular"
+                  width="360"
+                />
+              </div>
             </div>
 
             <div className="relative my-8 w-full text-center flex items-center">
