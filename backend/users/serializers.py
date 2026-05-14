@@ -277,5 +277,6 @@ class BlogPostSerializer(serializers.ModelSerializer):
             "updated_at",
             "is_published",
             "author_name",
+            "author",
         ]
-        read_only_fields = ["id", "slug", "created_at", "updated_at", "author_name"]
+        read_only_fields = ["id", "slug", "created_at", "updated_at", "author_name", "author"]
