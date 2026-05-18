@@ -290,3 +290,15 @@ class BlogPostSerializer(serializers.ModelSerializer):
             "author",
         ]
         read_only_fields = ["id", "slug", "created_at", "updated_at", "author_name", "author"]
+
+    def validate_title(self, value):
+        if len(value) > 255:
+            raise serializers.ValidationError("Title cannot be longer than 255 characters.")
+        if len(value.strip()) < 5:
+            raise serializers.ValidationError("Title must be at least 5 characters long.")
+        return value
+
+    def validate_content(self, value):
+        if len(value.strip()) < 10:
+            raise serializers.ValidationError("Content must be at least 10 characters long.")
+        return value

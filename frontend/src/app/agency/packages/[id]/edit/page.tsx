@@ -277,7 +277,7 @@ export default function EditPackagePage() {
                          <img src={mediaUrl(item.image)} alt="cover" className="w-full h-full object-cover" />
                       </div>
                     )}
-                    <input name="image" type="file" accept="image/*" className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-orange-50 file:text-orange-600 hover:file:bg-orange-100" />
+                    <input name="image" type="file" accept="image/jpeg,image/png,image/webp" className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-orange-50 file:text-orange-600 hover:file:bg-orange-100" />
                  </div>
                  <div className="space-y-4">
                     <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Current Map</label>
@@ -286,13 +286,13 @@ export default function EditPackagePage() {
                          <img src={mediaUrl((item as any).map_image)} alt="map" className="w-full h-full object-cover" />
                       </div>
                     )}
-                    <input name="map_image" type="file" accept="image/*" className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100" />
+                    <input name="map_image" type="file" accept="image/jpeg,image/png,image/webp" className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100" />
                  </div>
               </div>
 
               <div className="space-y-4 pt-6">
                 <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Update Gallery (Multiple)</label>
-                <input name="images" type="file" accept="image/*" multiple className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-purple-50 file:text-purple-600 hover:file:bg-purple-100" />
+                <input name="images" type="file" accept="image/jpeg,image/png,image/webp" multiple className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-purple-50 file:text-purple-600 hover:file:bg-purple-100" />
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest italic">* Selecting new gallery images will replace existing ones.</p>
               </div>
 

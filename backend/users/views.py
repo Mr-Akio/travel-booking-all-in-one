@@ -860,8 +860,12 @@ class BlogPostListCreateView(generics.ListCreateAPIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def perform_create(self, serializer):
-        # Use is_published from request data if provided, otherwise default to True
-        is_published = self.request.data.get('is_published', 'true').lower() == 'true'
+        # Safely parse is_published from request data without assuming it's a string
+        is_published_raw = self.request.data.get('is_published', 'true')
+        if isinstance(is_published_raw, bool):
+            is_published = is_published_raw
+        else:
+            is_published = str(is_published_raw).lower() == 'true'
         serializer.save(author=self.request.user, is_published=is_published)
 
 

@@ -166,7 +166,7 @@ class BlogPost(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     image = models.ImageField(upload_to=get_file_path, blank=True, null=True)
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
     is_published = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -182,7 +182,14 @@ class BlogPost(models.Model):
             if not original_slug:
                 original_slug = "article"
             
-            self.slug = f"{self.id}-{original_slug}"
+            # Ensure the slug fits well within max_length 255 (allowing headroom for ID)
+            prefix = f"{self.id}-"
+            max_slug_len = 240 - len(prefix)
+            truncated_slug = original_slug[:max_slug_len]
+            if truncated_slug.endswith('-'):
+                truncated_slug = truncated_slug[:-1]
+                
+            self.slug = f"{prefix}{truncated_slug}"
             # Save again with the new slug
             super().save(update_fields=['slug'])
 

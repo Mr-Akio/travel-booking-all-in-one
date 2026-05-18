@@ -42,6 +42,28 @@ export default function BlogCreatePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 🛡️ Front-end input validation
+    if (!title.trim()) {
+      toast.error('Title is required');
+      return;
+    }
+
+    if (title.length > 255) {
+      toast.error('Title is too long! Maximum length is 255 characters.');
+      return;
+    }
+
+    if (title.trim().length < 5) {
+      toast.error('Title must be at least 5 characters long.');
+      return;
+    }
+
+    if (content.trim().length < 10) {
+      toast.error('Content must be at least 10 characters long.');
+      return;
+    }
+
     setLoading(true);
 
     const formData = new FormData();
@@ -122,18 +144,39 @@ export default function BlogCreatePage() {
 
             <div className="space-y-6">
                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Article Title</label>
+                  <div className="flex justify-between items-center ml-1">
+                     <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Article Title</label>
+                     <span className={`text-[10px] font-black tracking-widest transition-colors ${
+                       title.length > 255 ? 'text-rose-500 font-bold' : 'text-slate-400'
+                     }`}>
+                       {title.length}/255
+                     </span>
+                  </div>
                   <input 
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="E.g. Exploring the Hidden Gems of Bangkok" 
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-900 font-bold outline-none focus:ring-2 focus:ring-orange-500 transition-all shadow-sm" 
+                    className={`w-full bg-slate-50 border rounded-2xl px-6 py-4 text-slate-900 font-bold outline-none focus:ring-2 transition-all shadow-sm ${
+                      title.length > 255 
+                        ? 'border-rose-500 focus:ring-rose-500' 
+                        : 'border-slate-200 focus:ring-orange-500'
+                    }`} 
                     required 
                   />
+                  {title.length > 255 && (
+                    <p className="text-xs text-rose-500 font-bold mt-1 ml-1 animate-pulse">
+                      Title is too long! Please keep it under 255 characters.
+                    </p>
+                  )}
                </div>
                
                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest ml-1">Content / Body</label>
+                  <div className="flex justify-between items-center ml-1">
+                     <label className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Content / Body</label>
+                     <span className="text-[10px] font-black text-slate-400 tracking-widest">
+                       {content.length} chars
+                     </span>
+                  </div>
                   <textarea 
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
@@ -159,7 +202,7 @@ export default function BlogCreatePage() {
                     <PlusIcon className="w-8 h-8 md:w-10 md:h-10 mb-2 group-hover:scale-110 transition-transform group-hover:text-orange-500" />
                     <p className="text-[10px] font-black uppercase tracking-widest">Click to upload cover image</p>
                   </div>
-                  <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                  <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} className="hidden" />
                 </label>
               ) : (
                 <div className="relative rounded-[2rem] overflow-hidden border-4 md:border-8 border-slate-50 shadow-inner group">
