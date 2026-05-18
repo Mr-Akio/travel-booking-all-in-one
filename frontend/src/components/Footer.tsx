@@ -12,13 +12,13 @@ export default function Footer() {
             <h4 className="text-2xl font-bold text-white mb-2 italic">Keep in Touch</h4>
             <p className="text-slate-400">Subscribe to get special offers and once-in-a-lifetime deals.</p>
           </div>
-          <div className="flex w-full max-w-md gap-0">
+          <div className="flex w-full max-w-md gap-0 min-w-0">
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 bg-white rounded-l-xl px-6 py-4 text-slate-900 outline-none"
+              className="flex-1 w-full min-w-0 bg-white rounded-l-xl px-4 md:px-6 py-3.5 md:py-4 text-sm md:text-base text-slate-900 outline-none"
             />
-            <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-r-xl px-8 py-4 transition-colors">
+            <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-r-xl px-5 md:px-8 py-3.5 md:py-4 text-sm md:text-base transition-colors shrink-0">
               Send
             </button>
           </div>
