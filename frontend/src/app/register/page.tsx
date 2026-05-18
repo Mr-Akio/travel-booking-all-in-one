@@ -100,7 +100,7 @@ export default function RegisterPage() {
                   useOneTap
                   theme="outline"
                   shape="rectangular"
-                  width="360"
+                  width="320"
                 />
               </div>
             </div>

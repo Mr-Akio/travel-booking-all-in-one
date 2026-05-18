@@ -228,6 +228,8 @@ def get_profile(request):
         'username': user.username,
         'email': user.email,
         'is_agency': bool(profile and profile.is_agency),   
+        'is_superuser': user.is_superuser,
+        'is_staff': user.is_staff,
         'birth_date': profile.birth_date if profile else '',
         'gender': profile.gender if profile else '',
         'phone': profile.phone if profile else '',
@@ -1046,11 +1048,15 @@ def agency_dashboard_stats(request):
     from django.db.models import Sum, F
     from .models import TourPackage, Booking
     
-    # Count packages
-    packages_count = TourPackage.objects.filter(owner_id=request.user.id).count()
-    
-    # Filter bookings for my packages
-    bookings_qs = Booking.objects.filter(package__owner_id=request.user.id)
+    if request.user.is_superuser:
+        # Superuser: view all packages and all bookings globally
+        packages_count = TourPackage.objects.count()
+        bookings_qs = Booking.objects.all()
+    else:
+        # Agency Partner: view only owned packages and bookings
+        packages_count = TourPackage.objects.filter(owner_id=request.user.id).count()
+        bookings_qs = Booking.objects.filter(package__owner_id=request.user.id)
+        
     bookings_count = bookings_qs.count()
     
     # Calculate revenue (confirmed bookings only)

@@ -100,18 +100,18 @@ export default function AgencyDashboardPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-              สวัสดีครับ, <span className="text-orange-500">Partner! 👋</span>
+              Welcome Back, <span className="text-orange-500">Partner! 👋</span>
             </h1>
-            <p className="text-slate-500 font-medium mt-2">นี่คือข้อมูลสรุปและสถานะทางธุรกิจของคุณในวันนี้นะครับ</p>
+            <p className="text-slate-500 font-medium mt-2">Here is a summary of your business performance today.</p>
           </div>
           <div className="flex items-center gap-3">
              <button className="flex items-center gap-2 bg-white border border-slate-200 text-slate-700 px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm">
                 <ArrowDownTrayIcon className="w-4 h-4" />
-                ดาวน์โหลดรายงาน
+                Download Report
              </button>
              <Link href="/agency/packages/create" className="flex items-center gap-2 bg-slate-900 text-white px-5 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest hover:bg-orange-500 hover:scale-105 transition-all shadow-lg shadow-slate-200">
                 <PlusIcon className="w-4 h-4 text-orange-400" />
-                สร้างแพ็กเกจใหม่
+                Create New Package
              </Link>
           </div>
         </div>
@@ -168,8 +168,8 @@ export default function AgencyDashboardPage() {
         <div className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-xl shadow-slate-100/40">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <h3 className="text-lg font-black text-slate-900 tracking-tight">สรุปสัดส่วนการจองทัวร์ (Trips Status Breakdown)</h3>
-              <p className="text-xs font-medium text-slate-400 mt-1">วิเคราะห์ตามสัดส่วนประเภทสถานะการจองทั้งหมด</p>
+              <h3 className="text-lg font-black text-slate-900 tracking-tight">Trips Status Breakdown</h3>
+              <p className="text-xs font-medium text-slate-400 mt-1">Analysis of all tour reservation statuses.</p>
             </div>
             <div className="text-2xl font-black text-slate-900 flex items-baseline gap-1">
               {stats?.bookings_count || 0} <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Bookings</span>
@@ -189,21 +189,21 @@ export default function AgencyDashboardPage() {
               <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-md shadow-emerald-500/20" />
               <div className="flex flex-col">
                 <span className="text-xs font-black text-slate-800">Confirmed (60%)</span>
-                <span className="text-[10px] font-bold text-slate-400">อนุมัติเรียบร้อยแล้ว</span>
+                <span className="text-[10px] font-bold text-slate-400">Reservation approved successfully</span>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-3.5 h-3.5 rounded-full bg-orange-500 shadow-md shadow-orange-500/20" />
               <div className="flex flex-col">
                 <span className="text-xs font-black text-slate-800">Pending (30%)</span>
-                <span className="text-[10px] font-bold text-slate-400">รอการตรวจสอบชำระเงิน</span>
+                <span className="text-[10px] font-bold text-slate-400">Awaiting payment verification</span>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-3.5 h-3.5 rounded-full bg-rose-500 shadow-md shadow-rose-500/20" />
               <div className="flex flex-col">
                 <span className="text-xs font-black text-slate-800">Cancelled (10%)</span>
-                <span className="text-[10px] font-bold text-slate-400">ยกเลิกรายการแล้ว</span>
+                <span className="text-[10px] font-bold text-slate-400">Reservation cancelled by traveler</span>
               </div>
             </div>
           </div>
@@ -214,12 +214,12 @@ export default function AgencyDashboardPage() {
            {/* Recent Activities styled as Travelie Feed */}
            <div className="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-xl shadow-slate-100/40">
               <div className="flex items-center justify-between mb-8">
-                 <h2 className="text-lg font-black text-slate-900 tracking-tight">การจองล่าสุด (Recent Activity)</h2>
-                 <Link href="/agency/bookings" className="text-[10px] font-black text-orange-500 uppercase tracking-widest hover:underline">ดูทั้งหมด</Link>
+                 <h2 className="text-lg font-black text-slate-900 tracking-tight">Recent Bookings</h2>
+                 <Link href="/agency/bookings" className="text-[10px] font-black text-orange-500 uppercase tracking-widest hover:underline">View All</Link>
               </div>
               <div className="space-y-4">
                  {stats?.activities.length === 0 ? (
-                   <div className="py-10 text-center text-slate-400 italic text-sm">ไม่พบประวัติการจองทัวร์ล่าสุด</div>
+                   <div className="py-10 text-center text-slate-400 italic text-sm">No recent tour bookings found</div>
                  ) : stats?.activities.map((act) => {
                     let dotColor = 'bg-orange-500';
                     let statusLabel = 'Pending';
@@ -287,13 +287,13 @@ export default function AgencyDashboardPage() {
                     <div className="w-12 h-12 rounded-xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
                        <QuestionMarkCircleIcon className="w-7 h-7 text-white" />
                     </div>
-                    <h3 className="text-lg font-black tracking-tight">ฝ่ายบริการพาร์ทเนอร์</h3>
+                     <h3 className="text-lg font-black tracking-tight">Partner Support Service</h3>
                   </div>
                   <p className="text-slate-400 text-xs md:text-sm font-medium leading-relaxed max-w-md">
-                     หากคุณมีข้อสงสัยเกี่ยวกับการตั้งค่า หรือต้องการความช่วยเหลือในการลงทะเบียนแพ็กเกจทัวร์ญี่ปุ่น ทีมงานสนับสนุนของเราพร้อมช่วยเหลือคุณตลอด 24 ชั่วโมงครับ
+                     Have questions or need assistance registering your Japan tour packages? Our dedicated partner support team is available 24/7.
                   </p>
                   <button className="mt-6 border border-slate-800 text-white w-full py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all">
-                     ติดต่อเจ้าหน้าที่เทคนิค
+                     Contact Tech Support
                   </button>
                </div>
             </div>

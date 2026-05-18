@@ -10,9 +10,11 @@ import {
   CalendarDaysIcon, 
   UserCircleIcon,
   BoltIcon,
-  ArrowLeftStartOnRectangleIcon
+  ArrowLeftStartOnRectangleIcon,
+  UserGroupIcon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline';
-import { api, mediaUrl, clearToken } from '@/lib/api';
+import { api, mediaUrl, clearToken, API_BASE } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
 const nav = [
@@ -31,6 +33,14 @@ export default function AgencyShell({ children }: PropsWithChildren) {
   const router = useRouter();
   const [userInfo, setUserInfo] = useState<any>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const currentNav = [...nav];
+  if (userInfo?.is_superuser) {
+    currentNav.push(
+      { href: `${API_BASE}/admin/auth/user/`, label: 'Manage Users', icon: UserGroupIcon, isExternal: true } as any,
+      { href: `${API_BASE}/admin/users/blogpost/`, label: 'Manage Blogs', icon: DocumentTextIcon, isExternal: true } as any
+    );
+  }
 
   const fetchUserInfo = async () => {
     try {
@@ -113,9 +123,23 @@ export default function AgencyShell({ children }: PropsWithChildren) {
           <div className="h-full flex flex-col md:h-auto space-y-8">
             <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-200 p-4 shadow-xl shadow-slate-100">
               <nav className="space-y-2">
-                {nav.map((n) => {
-                  const active = pathname === n.href || pathname.startsWith(n.href + '/');
+                {currentNav.map((n: any) => {
+                  const active = !n.isExternal && (pathname === n.href || pathname.startsWith(n.href + '/'));
                   const Icon = n.icon;
+                  if (n.isExternal) {
+                    return (
+                      <a
+                        key={n.href}
+                        href={n.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 rounded-2xl px-4 py-3 text-[13px] font-bold hover:bg-slate-50 text-slate-500 hover:text-slate-900 transition-all uppercase tracking-widest group cursor-pointer"
+                      >
+                        <Icon className="w-5 h-5 group-hover:text-orange-500 text-slate-400" />
+                        <span>{n.label}</span>
+                      </a>
+                    );
+                  }
                   return (
                     <Link
                       key={n.href}
@@ -148,12 +172,12 @@ export default function AgencyShell({ children }: PropsWithChildren) {
             <div className="hidden md:block relative overflow-hidden rounded-[2.5rem] bg-slate-900 p-8 text-white shadow-2xl">
               <div className="absolute top-0 right-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-orange-500/20 blur-3xl" />
               <div className="relative z-10">
-                <div className="text-lg font-black leading-tight">Growth <br/>Premium</div>
+                <div className="text-lg font-black leading-tight">Tip <br/>CMO</div>
                 <p className="mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
-                  Advanced travel tools.
+                  Use WebP images & concise tour descriptions to increase customer booking conversions by up to 40%.
                 </p>
                 <button className="mt-6 w-full rounded-xl bg-orange-500 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-slate-900 transition-all">
-                  Upgrade
+                  Got It
                 </button>
               </div>
             </div>
