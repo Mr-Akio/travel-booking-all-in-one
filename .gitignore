@@ -28,3 +28,9 @@ backend/db.sqlite3
 # Media & Static (Optional: ignore if you don't want to push uploaded images)
 backend/media/
 backend/staticfiles/
+
+# Robot Framework Local Test Suites & Reports
+ROBOT FRAME WORK/
+log.html
+output.xml
+report.html
