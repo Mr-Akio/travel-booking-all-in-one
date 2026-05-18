@@ -57,6 +57,12 @@ urlpatterns = [
     path('agency/bookings/<int:booking_id>/status/', views.agency_update_booking_status, name='agency_update_booking_status'),
     path('agency/stats/', views.agency_dashboard_stats, name='agency_dashboard_stats'),
     path('test-email/', views.test_email_sending, name='test_email_sending'),
+    
+    # ADMIN endpoints (Superuser management)
+    path('admin/users/', views.admin_users_management, name='admin_users_management'),
+    path('admin/users/<int:pk>/', views.admin_users_management, name='admin_users_management_detail'),
+    path('admin/blogs/', views.admin_blogs_management, name='admin_blogs_management'),
+    path('admin/blogs/<int:pk>/', views.admin_blogs_management, name='admin_blogs_management_detail'),
 
    
     

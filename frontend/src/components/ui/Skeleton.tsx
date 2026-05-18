@@ -1,6 +1,5 @@
 'use client';
 
-import { cn } from '@/lib/utils'; // Assuming you have a utils for class names, if not I will use a simple one
 
 interface SkeletonProps {
   className?: string;

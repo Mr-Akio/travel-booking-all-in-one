@@ -1123,3 +1123,126 @@ def test_email_sending(request):
             "error": str(e),
             "traceback": traceback.format_exc()
         }, status=500)
+
+
+# ===== ADMIN: Manage Users & Blogs (Superuser only) =====
+
+@api_view(['GET', 'PATCH', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def admin_users_management(request, pk=None):
+    if not request.user.is_superuser:
+        return Response({"detail": "Only superusers can access this resource."}, status=403)
+        
+    from django.contrib.auth.models import User
+    
+    if request.method == 'GET':
+        if pk:
+            try:
+                user = User.objects.get(pk=pk)
+                profile = getattr(user, 'userprofile', None)
+                return Response({
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email,
+                    'is_staff': user.is_staff,
+                    'is_superuser': user.is_superuser,
+                    'is_active': user.is_active,
+                    'date_joined': user.date_joined.isoformat(),
+                    'phone': profile.phone if profile else '',
+                    'is_agency': profile.is_agency if profile else False,
+                })
+            except User.DoesNotExist:
+                return Response({"detail": "User not found."}, status=404)
+        
+        users = User.objects.all().order_by('-date_joined')
+        data = []
+        for u in users:
+            profile = getattr(u, 'userprofile', None)
+            data.append({
+                'id': u.id,
+                'username': u.username,
+                'email': u.email,
+                'is_staff': u.is_staff,
+                'is_superuser': u.is_superuser,
+                'is_active': u.is_active,
+                'date_joined': u.date_joined.isoformat(),
+                'phone': profile.phone if profile else '',
+                'is_agency': profile.is_agency if profile else False,
+            })
+        return Response(data)
+        
+    elif request.method == 'PATCH':
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found."}, status=404)
+            
+        # Prevent self-deactivation or self-demotion to ensure absolute admin safety
+        if user == request.user and ('is_active' in request.data or 'is_superuser' in request.data or 'is_staff' in request.data):
+            return Response({"detail": "Cannot demote or deactivate yourself."}, status=400)
+            
+        if 'is_staff' in request.data:
+            user.is_staff = bool(request.data['is_staff'])
+        if 'is_superuser' in request.data:
+            user.is_superuser = bool(request.data['is_superuser'])
+        if 'is_active' in request.data:
+            user.is_active = bool(request.data['is_active'])
+            
+        user.save()
+        return Response({"message": "User updated successfully"})
+        
+    elif request.method == 'DELETE':
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response({"detail": "User not found."}, status=404)
+            
+        if user == request.user:
+            return Response({"detail": "Cannot delete yourself."}, status=400)
+            
+        user.delete()
+        return Response({"message": "User deleted successfully"})
+
+
+@api_view(['GET', 'PATCH', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def admin_blogs_management(request, pk=None):
+    if not request.user.is_superuser:
+        return Response({"detail": "Only superusers can access this resource."}, status=403)
+        
+    from .models import BlogPost
+    from .serializers import BlogPostSerializer
+    
+    if request.method == 'GET':
+        if pk:
+            try:
+                blog = BlogPost.objects.get(pk=pk)
+                serializer = BlogPostSerializer(blog)
+                return Response(serializer.data)
+            except BlogPost.DoesNotExist:
+                return Response({"detail": "Blog post not found."}, status=404)
+                
+        blogs = BlogPost.objects.all().order_by('-created_at')
+        serializer = BlogPostSerializer(blogs, many=True)
+        return Response(serializer.data)
+        
+    elif request.method == 'PATCH':
+        try:
+            blog = BlogPost.objects.get(pk=pk)
+        except BlogPost.DoesNotExist:
+            return Response({"detail": "Blog post not found."}, status=404)
+            
+        if 'is_published' in request.data:
+            blog.is_published = bool(request.data['is_published'])
+            
+        blog.save()
+        return Response({"message": "Blog updated successfully"})
+        
+    elif request.method == 'DELETE':
+        try:
+            blog = BlogPost.objects.get(pk=pk)
+        except BlogPost.DoesNotExist:
+            return Response({"detail": "Blog post not found."}, status=404)
+            
+        blog.delete()
+        return Response({"message": "Blog deleted successfully"})

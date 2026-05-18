@@ -37,8 +37,8 @@ export default function AgencyShell({ children }: PropsWithChildren) {
   const currentNav = [...nav];
   if (userInfo?.is_superuser) {
     currentNav.push(
-      { href: `${API_BASE}/admin/auth/user/`, label: 'Manage Users', icon: UserGroupIcon, isExternal: true } as any,
-      { href: `${API_BASE}/admin/users/blogpost/`, label: 'Manage Blogs', icon: DocumentTextIcon, isExternal: true } as any
+      { href: `/agency/users`, label: 'Manage Users', icon: UserGroupIcon },
+      { href: `/agency/blogs`, label: 'Manage Blogs', icon: DocumentTextIcon }
     );
   }
 
