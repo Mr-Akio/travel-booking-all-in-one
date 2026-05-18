@@ -100,7 +100,7 @@ export default function Navbar() {
                 className="flex items-center gap-2 md:gap-3 text-slate-700 hover:text-orange-500 transition-colors group"
               >
                 <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl overflow-hidden border-2 border-slate-50 shadow-sm group-hover:border-orange-200 transition-all relative bg-slate-100">
-                   {userInfo.profile_picture ? (
+                   {mediaUrl(userInfo.profile_picture) ? (
                      <Image 
                        src={mediaUrl(userInfo.profile_picture)} 
                        alt={userInfo.username} 

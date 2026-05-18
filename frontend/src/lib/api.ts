@@ -145,7 +145,7 @@ export const api = {
 };
 
 export function mediaUrl(path?: string | null) {
-  if (!path) return '';
+  if (!path || path === 'null' || path === 'undefined' || path.endsWith('/null') || path.endsWith('/undefined')) return '';
   if (/^https?:\/\//i.test(path)) return path;
   const p = path.startsWith('/') ? path : `/${path}`;
   // Add /media prefix if it's not already there

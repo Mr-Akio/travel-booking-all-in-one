@@ -122,7 +122,7 @@ export default function UserProfile() {
     </div>
   );
 
-  const avatarDisplay = previewUrl || mediaUrl(form.profile_picture) || '/images/profile.jpg';
+  const avatarDisplay = previewUrl || mediaUrl(form.profile_picture) || '';
 
   return (
     <div className="min-h-screen bg-slate-50 pt-32 pb-20 font-sans text-slate-900">
@@ -143,8 +143,12 @@ export default function UserProfile() {
           <aside className="lg:col-span-1 space-y-6">
              <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 p-8 border border-slate-100 flex flex-col items-center text-center">
                 <div className="relative group mb-6">
-                   <div className="w-32 h-32 rounded-[2.5rem] overflow-hidden border-4 border-slate-50 shadow-2xl relative group-hover:scale-105 transition-transform duration-500">
-                      <Image src={avatarDisplay} alt="Profile" fill className="object-cover" />
+                   <div className="w-32 h-32 rounded-[2.5rem] overflow-hidden border-4 border-slate-50 shadow-2xl relative group-hover:scale-105 transition-transform duration-500 bg-slate-50 flex items-center justify-center">
+                      {avatarDisplay ? (
+                         <Image src={avatarDisplay} alt="Profile" fill className="object-cover" />
+                      ) : (
+                         <UserIcon className="w-20 h-20 text-slate-300" />
+                      )}
                    </div>
                    <button 
                      onClick={onClickChangeAvatar}
